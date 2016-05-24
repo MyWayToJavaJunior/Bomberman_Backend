@@ -48,7 +48,7 @@ public class WebSocketConnection implements MessageSendable{
     }
 
     @OnWebSocketClose
-    public void onClose() {
+    public void onClose(int statusCode, String reason) {
         roomManager.removeUserFromRoom(user);
     }
 

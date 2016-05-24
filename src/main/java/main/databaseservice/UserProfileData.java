@@ -92,6 +92,7 @@ public class UserProfileData implements Serializable {
     @Column(name = "user_pic_path")
     private String userpicPath = null;
 
+    @SuppressWarnings("unused")
     private static final long serialVersionUID = -8706689714326132798L;
 
     //private Integer hash = null;
