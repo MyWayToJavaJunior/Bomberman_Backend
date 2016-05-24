@@ -1,5 +1,6 @@
 package bomberman.service;
 
+import main.accountservice.AccountService;
 import main.websockets.MessageSendable;
 import rest.UserProfile;
 
@@ -8,11 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RoomManagerConcurImpl implements RoomManager {
 
-    public RoomManagerConcurImpl(int numOfManagers) {
+    public RoomManagerConcurImpl(AccountService as, int numOfManagers) {
         roomManagers = new RoomManager[numOfManagers];
 
         for (int i = 0; i < numOfManagers; ++i)
-            roomManagers[i] = new RoomManagerImpl();
+            roomManagers[i] = new RoomManagerImpl(as);
     }
 
     @Override

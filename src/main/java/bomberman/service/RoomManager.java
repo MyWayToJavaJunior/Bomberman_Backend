@@ -1,5 +1,6 @@
 package bomberman.service;
 
+import main.accountservice.AccountService;
 import main.websockets.MessageSendable;
 import rest.UserProfile;
 

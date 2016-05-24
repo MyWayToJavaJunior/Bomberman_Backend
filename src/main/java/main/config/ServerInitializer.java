@@ -37,7 +37,7 @@ public class ServerInitializer {
 
         context.put(DataBaseService.class, createNewDBS());
         context.put(AccountService.class, createNewAccountService((DataBaseService) context.get(DataBaseService.class)));
-        context.put(RoomManager.class, createNewRoomManager());
+        context.put(RoomManager.class, createNewRoomManager((AccountService) context.get(AccountService.class)));
         context.put(Properties.class, getPropertiesMap());
 
         return context;
@@ -88,13 +88,13 @@ public class ServerInitializer {
         return accountService;
     }
 
-    private RoomManager createNewRoomManager() {
+    private RoomManager createNewRoomManager(AccountService accountService) {
         LOGGER.info("Instantiating RoomManager...");
         int numOfThreads = RoomManagerConcurImpl.DEFAULT_THREADS_AMOUNT;
         if (reader.getPropertyMap().containsKey("game_threads_number"))
             numOfThreads = Integer.parseInt(reader.getPropertyMap().get("game_threads_number"));
 
-        final RoomManager roomManager = new RoomManagerConcurImpl(numOfThreads);
+        final RoomManager roomManager = new RoomManagerConcurImpl(accountService, numOfThreads);
         LOGGER.info("OK.");
         return roomManager;
     }

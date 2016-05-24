@@ -33,6 +33,8 @@ public interface AccountService {
 
     void updateUserpic(UserProfile user, String path);
 
+    void updateScore(UserProfile user, int delta);
+
     void deleteUser(@NotNull Long id);
 
     void updateUser(UserProfile user);

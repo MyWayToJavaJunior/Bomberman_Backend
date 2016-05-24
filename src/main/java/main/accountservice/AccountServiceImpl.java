@@ -91,6 +91,12 @@ public class AccountServiceImpl implements AccountService {
         registeredUsers.save(user.getData());
     }
 
+    @Override
+    public void updateScore(UserProfile user, int delta) {
+        user.setScore(user.getScore() + delta);
+        registeredUsers.save(user.getData());
+    }
+
     private final Map<String, Long> activeUsers = new HashMap<>();
     private final DataBaseService registeredUsers;
 }

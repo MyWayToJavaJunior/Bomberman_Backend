@@ -4,6 +4,7 @@ import bomberman.mechanics.World;
 import bomberman.mechanics.WorldEvent;
 import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
+import main.accountservice.AccountService;
 import main.websockets.MessageSendable;
 import org.javatuples.Pair;
 import rest.UserProfile;
@@ -15,11 +16,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Room {
 
-    public Room(){
+    public Room() {
         id = ID_COUNTER.getAndIncrement();
     }
 
-    public Room(int overrideCapacity) {
+    public Room(AccountService as){
+        accountService = as;
+        id = ID_COUNTER.getAndIncrement();
+    }
+
+    public Room(AccountService as, int overrideCapacity) {
+        accountService = as;
         capacity = overrideCapacity;
         id = ID_COUNTER.getAndIncrement();
     }
@@ -232,6 +239,10 @@ public class Room {
             TimeHelper.executeAfter(TIME_TO_WAIT_ON_GAME_OVER, () -> {
                 if (!isFinished && world.getBombermanCount() == 1) {
                     isFinished = true;
+
+                    if (accountService != null)
+                        accountService.updateScore(playerMap.get(world.getBombermenIDs()[0]), SCORE_ON_GAME_WON);
+
                     broadcast(MessageCreator.createGameOverMessage(playerMap.get(world.getBombermenIDs()[0])));
                 }
             });
@@ -258,6 +269,8 @@ public class Room {
         return id;
     }
 
+    private AccountService accountService = null;
+
     private final int id;
     private int capacity = DEFAULT_CAPACITY;
     private final AtomicBoolean isEveryoneReady = new AtomicBoolean(false);
@@ -268,7 +281,7 @@ public class Room {
     private final Map<UserProfile, MessageSendable> websocketMap = new HashMap<>(4);
     private final Map<UserProfile, Pair<Boolean, Boolean>> readinessMap = new HashMap<>(4);
 
-    World world;
+    private World world;
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private volatile boolean isFinished = false;
     public static final int MINIMAL_TIME_STEP = 25; //ms
@@ -279,6 +292,7 @@ public class Room {
     public static final int DEFAULT_CAPACITY = 4;
     public static final int TIME_TO_WAIT_AFTER_READY = 3000; // ms
     public static final int TIME_TO_WAIT_ON_GAME_OVER = 500; // ms
+    public static final int SCORE_ON_GAME_WON = 100; // ms
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
 }

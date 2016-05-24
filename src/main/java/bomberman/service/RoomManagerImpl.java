@@ -1,6 +1,7 @@
 package bomberman.service;
 
 import bomberman.mechanics.WorldBuilderForeman;
+import main.accountservice.AccountService;
 import main.websockets.MessageSendable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RoomManagerImpl implements RoomManager {
 
-    public RoomManagerImpl() {
+    public RoomManagerImpl(AccountService as) {
+        accountService = as;
         createNewRoom();
     }
 
@@ -128,6 +130,8 @@ public class RoomManagerImpl implements RoomManager {
         else
             LOGGER.debug("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " < " + Room.MINIMAL_TIME_STEP + ". OK.");
     }
+
+    private AccountService accountService;
 
     private final Queue<Room> nonFilledRooms = new ConcurrentLinkedQueue<>();
     private final CopyOnWriteArrayList<Room> allRooms = new CopyOnWriteArrayList<>();
