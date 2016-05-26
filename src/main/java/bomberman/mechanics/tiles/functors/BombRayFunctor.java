@@ -12,5 +12,7 @@ public class BombRayFunctor extends ActionTileAbstractFunctor {
     @Override
     public void applyAction(Bomberman bomberman) {
         bomberman.affectHealth(Bomberman.MAX_HEALTH_BASE_VALUE);
+        if (bomberman.getCurrentHealth() != 0)
+            bomberman.resetCoordinates();
     }
 }

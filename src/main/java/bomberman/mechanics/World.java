@@ -56,7 +56,7 @@ public class World {
         if (spawnLocations.length < amount)
             throw new ArrayIndexOutOfBoundsException();
         for (int i = 0; i < amount; ++i) {
-            final Bomberman newBomberman = new Bomberman(getNextID(), this);
+            final Bomberman newBomberman = new Bomberman(getNextID(), this, spawnLocations[i]);
             newBomberman.setCoordinates(spawnLocations[i]);
             bombermen.add(newBomberman);
             processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, newBomberman.getType(), newBomberman.getID(), spawnLocations[i][0], spawnLocations[i][1]));
