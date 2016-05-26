@@ -10,6 +10,7 @@ import org.javatuples.Pair;
 import rest.UserProfile;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -71,6 +72,7 @@ public class Room {
         for (WorldEvent spawnEvent: worldSpawnDetails)
             transmit(spawnEvent, socket);
 
+        timeToKickMap.put(user, TIME_TO_KICK);
         websocketMap.put(user, socket);
         readinessMap.put(user, new Pair<>(false, false));
         broadcast(MessageCreator.createUserJoinedMessage(user, readinessMap.get(user).getValue0(), readinessMap.get(user).getValue1()));
@@ -84,6 +86,7 @@ public class Room {
         if (websocketMap.containsKey(user)) {
             websocketMap.remove(user);
             readinessMap.remove(user);
+            timeToKickMap.remove(user);
 
             recalculateReadiness();
 
@@ -95,6 +98,11 @@ public class Room {
         readinessMap.remove(user);
         readinessMap.put(user, new Pair<>(isReady, contentLoaded));
         broadcast(MessageCreator.createUserStateChangedMessage(user, isReady, contentLoaded));
+
+        if (isReady) {
+            timeToKickMap.remove(user);
+            timeToKickMap.put(user, TIME_TO_KICK);
+        }
 
         recalculateReadiness();
         startGameIfEveryoneIsReady();
@@ -118,6 +126,7 @@ public class Room {
 
     private void startGameIfEveryoneIsReady() {
         if (websocketMap.size() > 1 && hasEveryoneLoadedContent.get() && isEveryoneReady.get()) {
+            hasCountDownBegan.compareAndSet(false, true);
             TimeHelper.executeAfter(TIME_TO_WAIT_AFTER_READY, () ->
             {
                 recalculateReadiness();
@@ -126,6 +135,7 @@ public class Room {
                     assignBombermenToPlayers();
                     transmitEventsOnWorldCreation();
                     broadcast(MessageCreator.createWorldCreatedMessage(world.getName(), world.getWidth(), world.getHeight()));
+                    hasCountDownBegan.compareAndSet(true, false);
                 }
             });
         }
@@ -212,8 +222,17 @@ public class Room {
         if (isActive.get() && !isFinished && willWorldStateChangeOnNextTick()) {
             update(deltaT);
             return true;
-        }
+        } else
+            if (!hasCountDownBegan.get())
+                kickPlayersIfNeeded(deltaT);
+
         return false;
+    }
+
+    public void refreshUserKickTimer(UserProfile user) {
+        timeToKickMap.remove(user);
+        if (websocketMap.containsKey(user))
+            timeToKickMap.put(user, TIME_TO_KICK);
     }
 
     private boolean willWorldStateChangeOnNextTick() {
@@ -264,6 +283,26 @@ public class Room {
 
     }
 
+    private void kickPlayersIfNeeded(long deltaT) {
+        final List<UserProfile> scheduledKicks = new LinkedList<>();
+        if (!isActive.get() && !hasCountDownBegan.get())
+            for (Map.Entry<UserProfile, Integer> timeToKick: timeToKickMap.entrySet()) {
+                final UserProfile user = timeToKick.getKey();
+
+                if (!readinessMap.get(user).getValue0()){
+                    final int timeToKickLeft = timeToKick.getValue();
+
+                    timeToKickMap.remove(user);
+                    timeToKickMap.put(user, timeToKickLeft - (int) deltaT);
+
+                    if (timeToKickMap.get(user) < 0)
+                        scheduledKicks.add(user);
+                }
+            }
+
+        scheduledKicks.stream().forEach(this::removePlayer);
+    }
+
     @Override
     public int hashCode() {
         return id;
@@ -276,13 +315,15 @@ public class Room {
     private final AtomicBoolean isEveryoneReady = new AtomicBoolean(false);
     private final AtomicBoolean hasEveryoneLoadedContent = new AtomicBoolean(false);
 
-    private final Map<Integer, UserProfile> playerMap = new HashMap<>(4);
-    private final Map<UserProfile, Integer> reversePlayerMap = new HashMap<>(4);
-    private final Map<UserProfile, MessageSendable> websocketMap = new HashMap<>(4);
-    private final Map<UserProfile, Pair<Boolean, Boolean>> readinessMap = new HashMap<>(4);
+    private final Map<Integer, UserProfile> playerMap = new ConcurrentHashMap<>(4);
+    private final Map<UserProfile, Integer> reversePlayerMap = new ConcurrentHashMap<>(4);
+    private final Map<UserProfile, MessageSendable> websocketMap = new ConcurrentHashMap<>(4);
+    private final Map<UserProfile, Pair<Boolean, Boolean>> readinessMap = new ConcurrentHashMap<>(4);
+    private final Map<UserProfile, Integer> timeToKickMap = new ConcurrentHashMap<>(4);
 
     private World world;
     private final AtomicBoolean isActive = new AtomicBoolean(false);
+    private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
     private volatile boolean isFinished = false;
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
@@ -293,6 +334,7 @@ public class Room {
     public static final int TIME_TO_WAIT_AFTER_READY = 3000; // ms
     public static final int TIME_TO_WAIT_ON_GAME_OVER = 500; // ms
     public static final int SCORE_ON_GAME_WON = 100; // ms
+    public static final int TIME_TO_KICK = 30_000; // 30 seconds
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
 }
