@@ -153,7 +153,7 @@ public class Room {
     public void scheduleBombermanMovement(UserProfile user, int dirX, int dirY) {
         if (isActive.get() && !isFinished && reversePlayerMap.containsKey(user)) {
             final int bombermanID = reversePlayerMap.get(user);
-                scheduledActions.add(new WorldEvent(EventType.ENTITY_UPDATED, EntityType.BOMBERMAN, bombermanID, dirX, dirY, TimeHelper.now()));  // TODO: Should TimeHelper.now() be client's timestamp?
+                scheduledActions.add(new WorldEvent(EventType.ENTITY_UPDATED, EntityType.BOMBERMAN, bombermanID, dirX, dirY, null, TimeHelper.now()));  // TODO: Should TimeHelper.now() be client's timestamp?
         }
     }
 
@@ -161,7 +161,7 @@ public class Room {
         if (isActive.get() && !isFinished && reversePlayerMap.containsKey(user)) {
             final int bombermanID = reversePlayerMap.get(user);
 
-            scheduledActions.add(new WorldEvent(EventType.TILE_SPAWNED, EntityType.BOMB, bombermanID, 0, 0));
+            scheduledActions.add(new WorldEvent(EventType.TILE_SPAWNED, EntityType.BOMB, bombermanID, 0, 0, null));
         }
     }
 

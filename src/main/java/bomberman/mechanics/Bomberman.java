@@ -66,14 +66,14 @@ public class Bomberman implements IEntity {
     //
 
     // Use negative amounts for healing! =D
-    public void affectHealth(int amount) {
+    public void affectHealth(int amount, int initiator) {
         if (health > maxHealth)
             health = maxHealth;
 
         health -= amount;
 
         if (health < 0)
-            world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, TimeHelper.now()));
+            world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, initiator, TimeHelper.now()));
     }
 
     public void increaseMaxHealth() {

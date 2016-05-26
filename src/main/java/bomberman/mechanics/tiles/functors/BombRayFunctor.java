@@ -5,14 +5,17 @@ import bomberman.mechanics.World;
 
 public class BombRayFunctor extends ActionTileAbstractFunctor {
 
-    public BombRayFunctor(World eventList) {
+    public BombRayFunctor(World eventList, Bomberman owner) {
         super(eventList);
+        this.placer = owner;
     }
 
     @Override
     public void applyAction(Bomberman bomberman) {
-        bomberman.affectHealth(Bomberman.MAX_HEALTH_BASE_VALUE);
+        bomberman.affectHealth(Bomberman.MAX_HEALTH_BASE_VALUE, (placer == null) ? 0 : placer.getID());
         if (bomberman.getCurrentHealth() != 0)
             bomberman.resetCoordinates();
     }
+
+    private final Bomberman placer;
 }

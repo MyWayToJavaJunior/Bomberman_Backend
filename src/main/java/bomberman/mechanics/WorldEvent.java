@@ -2,26 +2,33 @@ package bomberman.mechanics;
 
 import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
+import org.jetbrains.annotations.Nullable;
 
 public class WorldEvent {
-    public WorldEvent(EventType eventType, EntityType entityType, int entityID, float x, float y){
+    public WorldEvent(EventType eventType, EntityType entityType, int entityID, float x, float y, @Nullable Integer initiator){
         this.eventType = eventType;
         this.entityType = entityType;
         this.entityID = entityID;
         this.x = x;
         this.y = y;
+        this.initiator = initiator;
         timestamp = 0;
     }
 
-    public WorldEvent(EventType eventType, @SuppressWarnings("SameParameterValue") EntityType entityType, int entityID, float x, float y, long timestamp) {
+    public WorldEvent(EventType eventType, @SuppressWarnings("SameParameterValue") EntityType entityType, int entityID, float x, float y, @Nullable Integer initiator, long timestamp) {
         this.eventType = eventType;
         this.entityType = entityType;
         this.entityID = entityID;
         this.x = x;
         this.y = y;
+        this.initiator = initiator;
         this.timestamp = timestamp;
     }
 
+    @Nullable
+    public Integer getInitiator() {
+        return initiator;
+    }
 
     public EventType getEventType() {
         return eventType;
@@ -55,4 +62,5 @@ public class WorldEvent {
     @SuppressWarnings("InstanceVariableNamingConvention")
     private final float y;
     private final long timestamp;
+    private final Integer initiator;
 }

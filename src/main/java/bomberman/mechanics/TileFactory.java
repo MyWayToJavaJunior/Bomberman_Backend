@@ -41,8 +41,6 @@ public class TileFactory {
         //noinspection EnumSwitchStatementWhichMissesCases
         switch (type)
         {
-            //case BONUS_HEAL:
-            //    return newBonusHealAllHP(id, list);
             case BONUS_INCMAXHP:
                 return newBonusIncreaseMaxHP(id, list);
             case BONUS_INCMAXRANGE:
@@ -55,6 +53,8 @@ public class TileFactory {
                 return newBonusIncreaseBombermanSpeed(id, list);
             case BONUS_MOREBOMBS:
                 return newBonusIncreaseMaxBombs(id, list);
+            case BONUS_DROPBOMBONDEATH:
+                return newBonusDropBombOnDeath(id, list);
             default:
                 LOGGER.error("Impossible to spawn " + type + "with three arguments method.");
                 throw new IllegalArgumentException();
@@ -88,12 +88,11 @@ public class TileFactory {
         return new OwnedActionTile(id, new NullFunctor(list), new BombBehavior(list, owner.getBombExplosionDelay()), EntityType.BOMB, owner);
     }
     private ITile newBombRay(int id, World list, Bomberman owner) {
-        return new OwnedActionTile(id, new BombRayFunctor(list), new BombRayBehavior(list), EntityType.BOMB_RAY, owner);
+        return new OwnedActionTile(id, new BombRayFunctor(list, owner), new BombRayBehavior(list), EntityType.BOMB_RAY, owner);
     }
 
-    @SuppressWarnings("unused")
-    private ITile newBonusHealAllHP(int id, World list){
-        return new ActionTile(id, new HealAllHPFunctor(list), new NullBehavior(list), EntityType.BONUS_HEAL);
+    private ITile newBonusDropBombOnDeath(int id, World list) {
+        return new ActionTile(id, new IncreaseMaxHPFunctor(list), new NullBehavior(list), EntityType.BONUS_INCMAXHP);
     }
     private ITile newBonusIncreaseMaxHP(int id, World list){
         return new ActionTile(id, new IncreaseMaxHPFunctor(list), new NullBehavior(list), EntityType.BONUS_INCMAXHP);
