@@ -117,13 +117,19 @@ public class Users {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserByID(@PathParam("id") Long id) {
+    public Response getUserByID(@PathParam("id") Long id, @Context HttpHeaders headers) {
         setup();
         final UserProfile user = accountService.getUser(id);
         if(user == null){
             return WebErrorManager.accessForbidden();
         }else {
-            return Response.ok(user.toJson().toString()).build();
+            if (accountService.hasSessionID(UserTokenManager.getSIDStringFromHeaders(headers))) {
+                final UserProfile currentUser = accountService.getBySessionID(UserTokenManager.getSIDStringFromHeaders(headers));
+                if (currentUser != null)
+                    return WebErrorManager.okRaw(user.toJson().toString()).cookie(UserTokenManager.getNewCookieWithSessionID(currentUser.getSessionID())).build();
+            }
+
+            return WebErrorManager.ok(user.toJson().toString());
         }
     }
 
@@ -156,6 +162,12 @@ public class Users {
                 final String password = jsonRequest.get("password").toString();
                 if (password != null)
                     user.setPassword(password);
+
+                /*final String userpic = jsonRequest.get("userpic64").toString();
+                if (userpic != null)
+                    user.setUserpicPath(userpic);*/
+
+                accountService.updateUser(user);
 
                 return Response.ok(new JSONObject().put("id", user.getId()).toString()).build();
             }

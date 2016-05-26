@@ -79,7 +79,7 @@ public class Sessions {
         if (accountService.hasSessionID(UserTokenManager.getSIDStringFromHeaders(headers))) {
             final UserProfile currentUser = accountService.getBySessionID(UserTokenManager.getSIDStringFromHeaders(headers));
             if (currentUser != null)
-                return Response.ok(new JSONObject().put("id", currentUser.getId()).toString()).build();
+                return WebErrorManager.okRaw(new JSONObject().put("id", currentUser.getId()).toString()).cookie(UserTokenManager.getNewCookieWithSessionID(currentUser.getSessionID())).build();
             else return WebErrorManager.serverError("Session exists, but no user is assigned to.");
         }
         else
