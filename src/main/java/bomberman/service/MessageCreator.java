@@ -15,7 +15,10 @@ public class MessageCreator {
         messageTemplate.put("contentLoaded", contentLoaded);
         messageTemplate.put("name", joinee.getLogin());
         messageTemplate.put("score", joinee.getScore());
-        messageTemplate.put("userpic_path", JSONObject.NULL);
+        if (joinee.getUserpicPath() == null)
+            messageTemplate.put("userpic_path", JSONObject.NULL);
+        else
+            messageTemplate.put("userpic_path", joinee.getUserpicPath());
 
         return messageTemplate.toString();
     }
