@@ -65,7 +65,7 @@ public class RoomManagerImpl implements RoomManager {
     }
 
     private Room createNewRoom() {
-        final Room room = new Room();
+        final Room room = new Room(accountService);
 
         room.createNewWorld(WorldBuilderForeman.getRandomWorldName());
         nonFilledRooms.add(room);
@@ -114,13 +114,13 @@ public class RoomManagerImpl implements RoomManager {
 
             final long totalUpdateTook = TimeHelper.now() - beforeUpdate;
 
-            TimeHelper.sleepFor(Room.MINIMAL_TIME_STEP - totalUpdateTook);
+            if (!wereAnyRoomUpdated)
+                TimeHelper.sleepFor(100);
+            else
+                TimeHelper.sleepFor(Room.MINIMAL_TIME_STEP - totalUpdateTook);
 
             previousTickDuration = TimeHelper.now() - beforeUpdate;
             logGameCycleTime(totalUpdateTook);
-
-            if (!wereAnyRoomUpdated)
-                TimeHelper.sleepFor(100);
         }
     }
 

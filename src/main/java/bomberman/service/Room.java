@@ -6,6 +6,8 @@ import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
 import main.accountservice.AccountService;
 import main.websockets.MessageSendable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.javatuples.Pair;
 import rest.UserProfile;
 
@@ -17,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Room {
 
+    @Deprecated
     public Room() {
         id = ID_COUNTER.getAndIncrement();
     }
@@ -99,10 +102,7 @@ public class Room {
         readinessMap.put(user, new Pair<>(isReady, contentLoaded));
         broadcast(MessageCreator.createUserStateChangedMessage(user, isReady, contentLoaded));
 
-        if (isReady) {
-            timeToKickMap.remove(user);
-            timeToKickMap.put(user, TIME_TO_KICK);
-        }
+        refreshUserKickTimer(user);
 
         recalculateReadiness();
         startGameIfEveryoneIsReady();
@@ -135,8 +135,8 @@ public class Room {
                     assignBombermenToPlayers();
                     transmitEventsOnWorldCreation();
                     broadcast(MessageCreator.createWorldCreatedMessage(world.getName(), world.getWidth(), world.getHeight()));
+                } else
                     hasCountDownBegan.compareAndSet(true, false);
-                }
             });
         }
     }
@@ -289,18 +289,22 @@ public class Room {
             for (Map.Entry<UserProfile, Integer> timeToKick: timeToKickMap.entrySet()) {
                 final UserProfile user = timeToKick.getKey();
 
-                if (!readinessMap.get(user).getValue0()){
+                if (user != null && !readinessMap.get(user).getValue0()){
                     final int timeToKickLeft = timeToKick.getValue();
 
                     timeToKickMap.remove(user);
                     timeToKickMap.put(user, timeToKickLeft - (int) deltaT);
+                    LOGGER.debug("Player #" + user.getId() + " \"" + user.getLogin() + "\" has " + timeToKickMap.get(user) + " milliseconds before he will get kicked.");
 
                     if (timeToKickMap.get(user) < 0)
                         scheduledKicks.add(user);
                 }
             }
 
-        scheduledKicks.stream().forEach(this::removePlayer);
+        for (UserProfile user: scheduledKicks) {
+            LOGGER.info("Kicking Player #" + user.getId() + " \"" + user.getLogin() + "\" for inactivity.");
+            removePlayer(user);
+        }
     }
 
     @Override
@@ -337,4 +341,5 @@ public class Room {
     public static final int TIME_TO_KICK = 30_000; // 30 seconds
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
+    private static final Logger LOGGER = LogManager.getLogger(Room.class);
 }

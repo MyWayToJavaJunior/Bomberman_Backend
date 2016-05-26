@@ -50,7 +50,7 @@ public class RoomManagerConcurImpl implements RoomManager {
         return roomManagers[lastManager].getCurrentRoom();
     }
 
-    public static final int DEFAULT_THREADS_AMOUNT = 4;
+    public static final int DEFAULT_THREADS_AMOUNT = 1;
 
     private int lastManager = 0;
     private final RoomManager[] roomManagers;
