@@ -117,19 +117,13 @@ public class Users {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserByID(@PathParam("id") Long id, @Context HttpHeaders headers) {
+    public Response getUserByID(@PathParam("id") Long id) {
         setup();
         final UserProfile user = accountService.getUser(id);
         if(user == null){
             return WebErrorManager.accessForbidden();
-        }else {
-            if (accountService.hasSessionID(UserTokenManager.getSIDStringFromHeaders(headers))) {
-                final UserProfile currentUser = accountService.getBySessionID(UserTokenManager.getSIDStringFromHeaders(headers));
-                if (currentUser != null)
-                    return WebErrorManager.okRaw(user.toJson().toString()).cookie(UserTokenManager.getNewCookieWithSessionID(currentUser.getSessionID())).build();
-            }
-
-            return WebErrorManager.ok(user.toJson().toString());
+        } else {
+            return Response.ok(user.toJson().toString()).build();
         }
     }
 

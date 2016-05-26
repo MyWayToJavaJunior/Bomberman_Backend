@@ -88,7 +88,7 @@ public class Room {
     public synchronized void removePlayer(UserProfile user) {
         if (websocketMap.containsKey(user)) {
             broadcast(MessageCreator.createUserLeftMessage(user));
-            
+
             websocketMap.remove(user);
             readinessMap.remove(user);
             timeToKickMap.remove(user);
@@ -337,8 +337,12 @@ public class Room {
     public static final int DEFAULT_CAPACITY = 4;
     public static final int TIME_TO_WAIT_AFTER_READY = 3000; // ms
     public static final int TIME_TO_WAIT_ON_GAME_OVER = 500; // ms
-    public static final int SCORE_ON_GAME_WON = 100; // ms
     public static final int TIME_TO_KICK = 30_000; // 30 seconds
+
+    public static final int SCORE_ON_GAME_WON = 500;
+    public static final int SCORE_ON_BOMBRMAN_KILL = 100;
+    public static final int SCORE_ON_BONUS_PICKED_UP = 2;
+    public static final int SCORE_ON_WALL_BROKEN = 1;
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
     private static final Logger LOGGER = LogManager.getLogger(Room.class);
