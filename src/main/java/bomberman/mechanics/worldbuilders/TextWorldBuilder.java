@@ -111,7 +111,7 @@ public class TextWorldBuilder implements IWorldBuilder {
             case 'R':
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_INCMAXRANGE, supplicant, supplicant.getNextID());
             case 'H':
-                return TileFactory.getInstance().getNewTile(EntityType.BONUS_HEAL, supplicant, supplicant.getNextID());
+                return TileFactory.getInstance().getNewTile(EntityType.BONUS_DROPBOMBONDEATH, supplicant, supplicant.getNextID());
             case 'M':
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_MOREBOMBS, supplicant, supplicant.getNextID());
             case 'U':

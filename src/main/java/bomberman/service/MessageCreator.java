@@ -55,8 +55,8 @@ public class MessageCreator {
             case UNDESTRUCTIBLE_WALL:
                 objectType = "undestructible_wall";
                 break;
-            case BONUS_HEAL:
-                objectType = "bonus_heal";
+            case BONUS_DROPBOMBONDEATH:
+                objectType = "bonus_drop_bomb_on_death";
                 break;
             case BONUS_INCMAXHP:
                 objectType = "bonus_increase_max_hp";
