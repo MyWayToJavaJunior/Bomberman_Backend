@@ -87,13 +87,13 @@ public class Room {
 
     public synchronized void removePlayer(UserProfile user) {
         if (websocketMap.containsKey(user)) {
+            broadcast(MessageCreator.createUserLeftMessage(user));
+            
             websocketMap.remove(user);
             readinessMap.remove(user);
             timeToKickMap.remove(user);
 
             recalculateReadiness();
-
-            broadcast(MessageCreator.createUserLeftMessage(user));
         }
     }
 
