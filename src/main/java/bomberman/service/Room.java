@@ -336,7 +336,7 @@ public class Room {
 
     public static final int DEFAULT_CAPACITY = 4;
     public static final int TIME_TO_WAIT_AFTER_READY = 3000; // ms
-    public static final int TIME_TO_WAIT_ON_GAME_OVER = 500; // ms
+    public static final int TIME_TO_WAIT_ON_GAME_OVER = 1500; // ms
     public static final int TIME_TO_KICK = 30_000; // 30 seconds
 
     public static final int SCORE_ON_GAME_WON = 500;

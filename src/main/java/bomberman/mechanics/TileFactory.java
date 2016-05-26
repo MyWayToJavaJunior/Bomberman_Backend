@@ -92,7 +92,7 @@ public class TileFactory {
     }
 
     private ITile newBonusDropBombOnDeath(int id, World list) {
-        return new ActionTile(id, new IncreaseMaxHPFunctor(list), new NullBehavior(list), EntityType.BONUS_INCMAXHP);
+        return new ActionTile(id, new DropBombOnDeathFunctor(list), new NullBehavior(list), EntityType.BONUS_DROPBOMBONDEATH);
     }
     private ITile newBonusIncreaseMaxHP(int id, World list){
         return new ActionTile(id, new IncreaseMaxHPFunctor(list), new NullBehavior(list), EntityType.BONUS_INCMAXHP);
@@ -115,6 +115,6 @@ public class TileFactory {
     }
 
     private static final TileFactory SINGLETON = new TileFactory();
-    private static final int BONUS_COUNT = 6;
+    private static final int BONUS_COUNT = 7;
     private static final Logger LOGGER = LogManager.getLogger(TileFactory.class);
 }

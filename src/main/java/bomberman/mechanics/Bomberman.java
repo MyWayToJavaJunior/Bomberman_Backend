@@ -148,6 +148,14 @@ public class Bomberman implements IEntity {
         currentPlaceableBombs += BOMB_AMOUNT_INCREMENT;
     }
 
+    public void makeDropBombOnDeath() {
+        shouldDropBombOnDeath = true;
+    }
+
+    public boolean shouldDropBombOnDeath() {
+        return shouldDropBombOnDeath;
+    }
+
     //
     // Speed Actions
     //
@@ -215,6 +223,8 @@ public class Bomberman implements IEntity {
     private int maxBombsCanBePlaced;
     public static final int BASE_BOMB_AMOUNT = 1;    // 1 tile
     public static final int BOMB_AMOUNT_INCREMENT = 1;
+
+    private boolean shouldDropBombOnDeath = false;
 
     private float maximalSpeed;
     public static final float BASE_MAX_SPEED = 3f / 1000f;    // 3 tiles per second

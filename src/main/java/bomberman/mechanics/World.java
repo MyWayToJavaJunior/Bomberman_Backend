@@ -415,7 +415,12 @@ public class World {
     }
 
     private void killBomberman(WorldEvent event) {
-        bombermen.remove(getBombermanByID(event.getEntityID()));
+        final Bomberman deadOne = getBombermanByID(event.getEntityID());
+
+        if (deadOne != null && deadOne.shouldDropBombOnDeath())
+            tryPlacingBomb(deadOne.getID());
+
+        bombermen.remove(deadOne);
         processedEventQueue.add(event);
     }
 
@@ -425,26 +430,34 @@ public class World {
             switch (randomizer.nextInt() % TileFactory.getBonusCount()) {
                 case 0:
                     type = EntityType.BONUS_INCMAXRANGE;
+                    LOGGER.info("Random bonus number 0");
                     break;
                 case 1:
                     type = EntityType.BONUS_DECBOMBSPAWN;
+                    LOGGER.info("Random bonus number 1");
                     break;
                 case 2:
                     type = EntityType.BONUS_DECBOMBFUSE;
+                    LOGGER.info("Random bonus number 2");
                     break;
                 case 3:
                     type = EntityType.BONUS_INCMAXHP;
+                    LOGGER.info("Random bonus number 3");
                     break;
                 case 4:
                     type = EntityType.BONUS_INCSPEED;
+                    LOGGER.info("Random bonus number 4");
                     break;
-                //case 5:
-                //    type = EntityType.BONUS_HEAL;
-                //    break;
                 case 5:
                     type = EntityType.BONUS_MOREBOMBS;
+                    LOGGER.info("Random bonus number 5");
+                    break;
+                case 6:
+                    type = EntityType.BONUS_DROPBOMBONDEATH;
+                    LOGGER.info("Random bonus number 6");
                     break;
                 default:
+                    LOGGER.warn("Random bonus numbergenerator failed! It is greater than 6!");
                     return;
             }
 
