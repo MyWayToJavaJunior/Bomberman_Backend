@@ -197,7 +197,9 @@ public class Room {
     }
 
     private void broadcastFreshEvents() {
-        for (WorldEvent event : world.getFreshEvents())
+        for (WorldEvent event : world.getFreshEvents()) {
+            rewardPlayers(event);
+            
             switch (event.getEventType()) {
                 case ENTITY_UPDATED:
                     broadcast(MessageCreator.createObjectChangedMessage(event));
@@ -214,6 +216,7 @@ public class Room {
                     broadcast(MessageCreator.createObjectDestroyedMessage(event));
                     break;
             }
+        }
     }
 
     // http://gafferongames.com/game-physics/fix-your-timestep/
@@ -304,6 +307,30 @@ public class Room {
         for (UserProfile user: scheduledKicks) {
             LOGGER.info("Kicking Player #" + user.getId() + " \"" + user.getLogin() + "\" for inactivity.");
             removePlayer(user);
+        }
+    }
+
+    private void rewardPlayers(WorldEvent event) {
+        if (event.getInitiator() != null && event.getEventType() == EventType.TILE_REMOVED) {
+            final UserProfile initiator = playerMap.get(event.getInitiator());
+
+            if (initiator != null) {
+                if (event.getEntityType() == EntityType.DESTRUCTIBLE_WALL)
+                    accountService.updateScore(initiator, SCORE_ON_WALL_BROKEN);
+
+                if (event.getEntityType() == EntityType.BONUS_DECBOMBFUSE || event.getEntityType() == EntityType.BONUS_DECBOMBSPAWN ||
+                        event.getEntityType() == EntityType.BONUS_DROPBOMBONDEATH || event.getEntityType() == EntityType.BONUS_INCMAXHP ||
+                        event.getEntityType() == EntityType.BONUS_INCMAXRANGE || event.getEntityType() == EntityType.BONUS_INCMAXRANGE ||
+                        event.getEntityType() == EntityType.BONUS_INCSPEED || event.getEntityType() == EntityType.BONUS_MOREBOMBS)
+                    accountService.updateScore(initiator, SCORE_ON_BONUS_PICKED_UP);
+
+                if (event.getEntityType() == EntityType.BOMBERMAN) {
+                    final UserProfile deadOne = playerMap.get(event.getEntityID());
+                    if (deadOne != null)
+                        accountService.updateScore(deadOne, -SCORE_ON_BOMBRMAN_KILL);
+                    accountService.updateScore(initiator, SCORE_ON_BOMBRMAN_KILL);
+                }
+            }
         }
     }
 

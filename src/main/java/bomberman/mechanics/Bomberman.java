@@ -5,6 +5,7 @@ import bomberman.mechanics.interfaces.EventType;
 import bomberman.mechanics.interfaces.IEntity;
 import bomberman.service.TimeHelper;
 import org.javatuples.Triplet;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -66,7 +67,7 @@ public class Bomberman implements IEntity {
     //
 
     // Use negative amounts for healing! =D
-    public void affectHealth(int amount, int initiator) {
+    public void affectHealth(int amount, @Nullable Integer initiator) {
         if (health > maxHealth)
             health = maxHealth;
 
