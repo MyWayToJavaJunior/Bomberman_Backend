@@ -73,7 +73,7 @@ public class Bomberman implements IEntity {
 
         health -= amount;
 
-        if (health < 0)
+        if (health <= 0)
             world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, initiator, TimeHelper.now()));
     }
 
