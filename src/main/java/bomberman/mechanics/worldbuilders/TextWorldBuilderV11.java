@@ -2,7 +2,9 @@ package bomberman.mechanics.worldbuilders;
 
 import bomberman.mechanics.TileFactory;
 import bomberman.mechanics.World;
-import bomberman.mechanics.interfaces.*;
+import bomberman.mechanics.interfaces.EntityType;
+import bomberman.mechanics.interfaces.ITile;
+import bomberman.mechanics.interfaces.IWorldBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -12,8 +14,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-
-public class TextWorldBuilder implements IWorldBuilder {
+////
+////
+//  Difference from v1.0:
+//    * Undestructible wall is 'x' now instead of '#'. Easier to type.
+//    * World dimensions are now variable, but world is still square.
+////
+////
+public class TextWorldBuilderV11 implements IWorldBuilder {
 
     public static Map<String, IWorldBuilder> getAllTextBuilders() {
         final HashMap<String, IWorldBuilder> builders = new HashMap<>();
@@ -26,7 +34,7 @@ public class TextWorldBuilder implements IWorldBuilder {
                 if (!blueprint.isDirectory())
                     try {
                         final String nameWithoutExtension = blueprint.getName().substring(0, blueprint.getName().lastIndexOf('.'));
-                        builders.put(nameWithoutExtension, new TextWorldBuilder(blueprint));
+                        builders.put(nameWithoutExtension, new TextWorldBuilderV11(blueprint));
                     } catch (Exception ex) {
                         LOGGER.error("Cannot build world from file\"" + blueprint.getAbsolutePath() + "\". It is corrupted.");
                     }
@@ -35,7 +43,7 @@ public class TextWorldBuilder implements IWorldBuilder {
     }
 
     @SuppressWarnings("OverlyBroadThrowsClause")
-    public TextWorldBuilder(File blueprint) {
+    public TextWorldBuilderV11(File blueprint) throws Exception {
         BufferedReader strings = null;
         //noinspection OverlyBroadCatchBlock
         try {
@@ -44,13 +52,23 @@ public class TextWorldBuilder implements IWorldBuilder {
 
             if (!strings.readLine().equals(CURRENT_VERSION))
                 throw new Exception();
+
             name = strings.readLine();
-            for (int i = 0; i < WORLD_HEIGHT; ++i)
-                rawTiles.add(strings.readLine());
-            if (rawTiles.size() != WORLD_HEIGHT)
-                throw new Exception();
-        }
-        catch (IOException ex) {
+            String newLine = strings.readLine();
+            rawTiles.add(newLine);  // 1st line of tiles specifies world width.
+
+            boolean reachedEOF = false;
+            while (!reachedEOF) {
+                newLine = strings.readLine();
+
+                if (newLine.equals(EOF_TAG) || newLine.length() != rawTiles.get(0).length())
+                    reachedEOF = true;
+                else
+                    rawTiles.add(newLine);
+
+            }
+
+        } catch (IOException ex) {
             LOGGER.error("Cannot read\"" + blueprint.getAbsolutePath() + "\" due to some weird reason! Check server's rights.");
         } catch (Exception ex) {
             LOGGER.info("World \"" + blueprint.getAbsolutePath() + "\" has version different version than " + CURRENT_VERSION);
@@ -61,7 +79,6 @@ public class TextWorldBuilder implements IWorldBuilder {
                 } catch (IOException e) {
                     LOGGER.info(e);
                 }
-
         }
     }
 
@@ -85,7 +102,7 @@ public class TextWorldBuilder implements IWorldBuilder {
     }
 
     private void generateWorldFromText() {
-        tileArray = new ITile[WORLD_HEIGHT][WORLD_WIDTH];
+        tileArray = new ITile[rawTiles.size()][rawTiles.get(0).length()];
 
         int y = 0;
         for (String row : rawTiles) {
@@ -106,7 +123,7 @@ public class TextWorldBuilder implements IWorldBuilder {
         {
             case '.':
                 return null;
-            case '#':
+            case 'x':
                 return TileFactory.getInstance().getNewTile(EntityType.UNDESTRUCTIBLE_WALL, supplicant.getNextID());
             case 'd':
                 return TileFactory.getInstance().getNewTile(EntityType.DESTRUCTIBLE_WALL, supplicant.getNextID());
@@ -133,16 +150,14 @@ public class TextWorldBuilder implements IWorldBuilder {
         }
     }
 
-
     private World supplicant;
     private ITile[][] tileArray;
     private final Queue<float[]> spawnList = new LinkedList<>();
     private String name = "REPORT AS A BUG";
     private final ArrayList<String> rawTiles = new ArrayList<>(32);
 
-    private static final Logger LOGGER = LogManager.getLogger(TextWorldBuilder.class);
-    private static final String CURRENT_VERSION = "v1.0";
-    private static final int WORLD_HEIGHT = 32;
-    private static final int WORLD_WIDTH = 32;
+    private static final Logger LOGGER = LogManager.getLogger(TextWorldBuilderV11.class);
+    private static final String CURRENT_VERSION = "v1.1";
+    private static final String EOF_TAG = "#EOF";
 
 }

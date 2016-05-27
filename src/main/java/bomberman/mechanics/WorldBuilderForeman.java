@@ -3,6 +3,7 @@ package bomberman.mechanics;
 import bomberman.mechanics.interfaces.IWorldBuilder;
 import bomberman.mechanics.worldbuilders.BasicWorldBuilder;
 import bomberman.mechanics.worldbuilders.TextWorldBuilder;
+import bomberman.mechanics.worldbuilders.TextWorldBuilderV11;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +29,17 @@ public class WorldBuilderForeman {
         return names.get(Math.abs(randomInt.nextInt()) % names.size());
     }
 
-    private static final Map<String, IWorldBuilder> BUILDERS = TextWorldBuilder.getAllTextBuilders();
+    private static Map<String, IWorldBuilder> collectBuilders() {
+        final Map<String, IWorldBuilder> all = new HashMap<>();
+        final Map<String, IWorldBuilder> v10 = TextWorldBuilder.getAllTextBuilders();
+        final Map<String, IWorldBuilder> v11 = TextWorldBuilderV11.getAllTextBuilders();
+
+        all.putAll(v10);
+        all.putAll(v11);
+
+        return all;
+    }
+
+    private static final Map<String, IWorldBuilder> BUILDERS = collectBuilders();
     private static final Logger LOGGER = LogManager.getLogger(WorldBuilderForeman.class);
 }
