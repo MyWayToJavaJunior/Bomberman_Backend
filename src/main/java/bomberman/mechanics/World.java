@@ -430,27 +430,27 @@ public class World {
             switch (Math.abs(randomizer.nextInt() % TileFactory.getBonusCount())) {
                 case 0:
                     type = EntityType.BONUS_INCMAXRANGE;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 1:
                     type = EntityType.BONUS_DECBOMBSPAWN;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 2:
                     type = EntityType.BONUS_INCMAXHP;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 3:
                     type = EntityType.BONUS_INCSPEED;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 4:
                     type = EntityType.BONUS_MOREBOMBS;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 5:
                     type = EntityType.BONUS_DROPBOMBONDEATH;
-                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 default:
                     LOGGER.warn("Random bonus numbergenerator failed! It is greater than 5!");
