@@ -456,6 +456,10 @@ public class World {
                     type = EntityType.BONUS_DROPBOMBONDEATH;
                     LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
+                case 6:
+                    type = EntityType.BONUS_INVUL;
+                    LOGGER.debug("Spawning " + type + " at x: " + x + ", y: " + y);
+                    break;
                 default:
                     LOGGER.warn("Random bonus numbergenerator failed! It is greater than 5!");
                     return;
@@ -526,7 +530,7 @@ public class World {
     private int selfUpdatingEntities = 0;
 
     public static final float ACTION_TILE_HANDICAP_DIAMETER = 0.05f; // 0.75-0.05 will
-    public static final int PERCENT_TO_SPAWN_BONUS = 33;
+    public static final int PERCENT_TO_SPAWN_BONUS = 25;
 
     private static final Logger LOGGER = LogManager.getLogger(World.class);
 }
