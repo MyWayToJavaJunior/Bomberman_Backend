@@ -125,7 +125,7 @@ public class World {
     private void processTileSpawnedEvent(WorldEvent event) {
         LOGGER.debug("Processing object_spawned");
         if (event.getEntityType() == EntityType.BOMB)
-            tryPlacingBomb(event.getEntityID());
+            tryPlacingBomb(event.getEntityID(), false);
         else placeTile(event);
     }
 
@@ -324,7 +324,7 @@ public class World {
         uniqueTiles.stream().filter(uniqueTile -> uniqueTile != null).forEach(uniqueTile -> uniqueTile.applyAction(actor));
     }
 
-    private void tryPlacingBomb(int bombermanID) {
+    private void tryPlacingBomb(int bombermanID, boolean force) {
         final Bomberman actor = getBombermanByID(bombermanID);
         if (actor == null)
             return;
@@ -332,7 +332,7 @@ public class World {
         final int x = (int) Math.floor(actor.getCoordinates()[0]);
         final int y = (int) Math.floor(actor.getCoordinates()[1]);
 
-        if (actor.canSpawnBomb() && tileArray[y][x] == null)
+        if (actor.canSpawnBomb() && tileArray[y][x] == null || force)
         {
             tileArray[y][x] = TileFactory.getInstance().getNewTile(EntityType.BOMB, this, actor, getNextID());
             actor.takeOnePlaceableBomb();
@@ -418,7 +418,7 @@ public class World {
         final Bomberman deadOne = getBombermanByID(event.getEntityID());
 
         if (deadOne != null && deadOne.shouldDropBombOnDeath())
-            tryPlacingBomb(deadOne.getID());
+            tryPlacingBomb(deadOne.getID(), true);
 
         bombermen.remove(deadOne);
         processedEventQueue.add(event);
