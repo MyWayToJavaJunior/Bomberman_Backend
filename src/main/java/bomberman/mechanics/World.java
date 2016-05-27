@@ -430,34 +430,30 @@ public class World {
             switch (Math.abs(randomizer.nextInt() % TileFactory.getBonusCount())) {
                 case 0:
                     type = EntityType.BONUS_INCMAXRANGE;
-                    LOGGER.debug("Random bonus number 0");
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 1:
                     type = EntityType.BONUS_DECBOMBSPAWN;
-                    LOGGER.debug("Random bonus number 1");
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 2:
-                    type = EntityType.BONUS_DECBOMBFUSE;
-                    LOGGER.debug("Random bonus number 2");
+                    type = EntityType.BONUS_INCMAXHP;
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 3:
-                    type = EntityType.BONUS_INCMAXHP;
-                    LOGGER.debug("Random bonus number 3");
+                    type = EntityType.BONUS_INCSPEED;
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 4:
-                    type = EntityType.BONUS_INCSPEED;
-                    LOGGER.debug("Random bonus number 4");
+                    type = EntityType.BONUS_MOREBOMBS;
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 case 5:
-                    type = EntityType.BONUS_MOREBOMBS;
-                    LOGGER.debug("Random bonus number 5");
-                    break;
-                case 6:
                     type = EntityType.BONUS_DROPBOMBONDEATH;
-                    LOGGER.debug("Random bonus number 6");
+                    LOGGER.info("Spawning " + type + " at x: " + x + ", y: " + y);
                     break;
                 default:
-                    LOGGER.warn("Random bonus numbergenerator failed! It is greater than 6!");
+                    LOGGER.warn("Random bonus numbergenerator failed! It is greater than 5!");
                     return;
             }
 

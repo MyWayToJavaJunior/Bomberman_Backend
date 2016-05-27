@@ -115,6 +115,6 @@ public class TileFactory {
     }
 
     private static final TileFactory SINGLETON = new TileFactory();
-    private static final int BONUS_COUNT = 7;
+    private static final int BONUS_COUNT = 6;
     private static final Logger LOGGER = LogManager.getLogger(TileFactory.class);
 }
