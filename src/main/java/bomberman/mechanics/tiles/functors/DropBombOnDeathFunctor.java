@@ -13,6 +13,6 @@ public class DropBombOnDeathFunctor extends ActionTileAbstractFunctor {
     @Override
     public void applyAction(Bomberman bomberman) {
         bomberman.makeDropBombOnDeath();
-        eventList.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, owner.getType(), owner.getID(), 0, 0, null));
+        eventList.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, owner.getType(), owner.getID(), 0, 0, bomberman.getID()));
     }
 }

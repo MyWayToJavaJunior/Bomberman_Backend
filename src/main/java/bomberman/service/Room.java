@@ -318,17 +318,19 @@ public class Room {
                 if (event.getEntityType() == EntityType.DESTRUCTIBLE_WALL)
                     accountService.updateScore(initiator, SCORE_ON_WALL_BROKEN);
 
-                if (event.getEntityType() == EntityType.BONUS_DECBOMBFUSE || event.getEntityType() == EntityType.BONUS_DECBOMBSPAWN ||
-                        event.getEntityType() == EntityType.BONUS_DROPBOMBONDEATH || event.getEntityType() == EntityType.BONUS_INCMAXHP ||
-                        event.getEntityType() == EntityType.BONUS_INCMAXRANGE || event.getEntityType() == EntityType.BONUS_INCMAXRANGE ||
+                if (event.getEntityType() == EntityType.BONUS_DECBOMBSPAWN || event.getEntityType() == EntityType.BONUS_DROPBOMBONDEATH ||
+                        event.getEntityType() == EntityType.BONUS_INCMAXHP || event.getEntityType() == EntityType.BONUS_INCMAXRANGE ||
                         event.getEntityType() == EntityType.BONUS_INCSPEED || event.getEntityType() == EntityType.BONUS_MOREBOMBS)
                     accountService.updateScore(initiator, SCORE_ON_BONUS_PICKED_UP);
 
                 if (event.getEntityType() == EntityType.BOMBERMAN) {
                     final UserProfile deadOne = playerMap.get(event.getEntityID());
+
                     if (deadOne != null)
                         accountService.updateScore(deadOne, -SCORE_ON_BOMBRMAN_KILL);
-                    accountService.updateScore(initiator, SCORE_ON_BOMBRMAN_KILL);
+
+                    if (deadOne != null && !deadOne.equals(initiator))
+                        accountService.updateScore(initiator, SCORE_ON_BOMBRMAN_KILL);
                 }
             }
         }
