@@ -126,6 +126,8 @@ public class TextWorldBuilder implements IWorldBuilder {
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_INCMAXHP, supplicant, supplicant.getNextID());
             case 'F':
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_INCSPEED, supplicant, supplicant.getNextID());
+            case 'I':
+                return TileFactory.getInstance().getNewTile(EntityType.BONUS_INVUL, supplicant, supplicant.getNextID());
             case 'S':
                 spawnList.add(new float[]{x + 0.5f, y + 0.5f});
                 return null;

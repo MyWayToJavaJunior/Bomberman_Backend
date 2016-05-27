@@ -55,6 +55,8 @@ public class TileFactory {
                 return newBonusIncreaseMaxBombs(id, list);
             case BONUS_DROPBOMBONDEATH:
                 return newBonusDropBombOnDeath(id, list);
+            case BONUS_INVUL:
+                return newBonusInvulnerability(id, list);
             default:
                 LOGGER.error("Impossible to spawn " + type + "with three arguments method.");
                 throw new IllegalArgumentException();
@@ -109,12 +111,15 @@ public class TileFactory {
     private ITile newBonusIncreaseBombermanSpeed(int id, World list){
         return new ActionTile(id, new IncreaseSpeedFunctor(list), new NullBehavior(list), EntityType.BONUS_INCSPEED);
     }
+    private ITile newBonusInvulnerability(int id, World list){
+        return new ActionTile(id, new InvulnerabilityFunctor(list), new NullBehavior(list), EntityType.BONUS_INVUL);
+    }
 
     private ITile newBonusIncreaseMaxBombs(int id, World list) {
         return new ActionTile(id, new IncreaseSpawnableBombAmountFunctor(list), new NullBehavior(list), EntityType.BONUS_INCSPEED);
     }
 
     private static final TileFactory SINGLETON = new TileFactory();
-    private static final int BONUS_COUNT = 6;
+    private static final int BONUS_COUNT = 7;
     private static final Logger LOGGER = LogManager.getLogger(TileFactory.class);
 }

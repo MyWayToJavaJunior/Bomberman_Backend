@@ -22,6 +22,7 @@ public class Bomberman implements IEntity {
         maxBombsCanBePlaced = BASE_BOMB_AMOUNT;
         currentPlaceableBombs = maxBombsCanBePlaced;
         maximalSpeed = BASE_MAX_SPEED;
+        invulnerabilityTimer = INVULNERABILITY_TIME;
         this.spawnCoordinates = spawnCoordinates;
         this.world = world;
     }
@@ -54,7 +55,9 @@ public class Bomberman implements IEntity {
     public void update(long deltaT) {
         if (bombSpawnTimer >= 0)
             bombSpawnTimer =- deltaT;
-        // else it can be somewhere below zero. xD (if dT is about 1000 ms)
+
+        if (invulnerabilityTimer >= 0)
+            invulnerabilityTimer = -deltaT;
     }
 
     public boolean canSpawnBomb() {
@@ -71,7 +74,12 @@ public class Bomberman implements IEntity {
         if (health > maxHealth)
             health = maxHealth;
 
-        health -= amount;
+        if (amount < 0) {
+            if (invulnerabilityTimer <= 0)
+                health -= amount;
+            activateInvulnerabilityTimer();
+        } else
+            health -= amount;
 
         if (health <= 0)
             world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, initiator, TimeHelper.now()));
@@ -88,6 +96,10 @@ public class Bomberman implements IEntity {
 
     public int getCurrentHealth() {
         return health;
+    }
+
+    public void activateInvulnerabilityTimer() {
+        invulnerabilityTimer = INVULNERABILITY_TIME;
     }
 
     //
@@ -205,6 +217,8 @@ public class Bomberman implements IEntity {
     public static final int MAX_HEALTH_BASE_VALUE = 1;
     public static final int MAX_HEALTH_INCREMENT = 1;   // One powerup for double life. Three powerups for triple life. ()
 
+    private long invulnerabilityTimer;
+    public static final long INVULNERABILITY_TIME = 1500; // 1.5 seconds
 
     // Bomb Description
     private long bombSpawnTimer;
@@ -227,6 +241,7 @@ public class Bomberman implements IEntity {
 
     private boolean shouldDropBombOnDeath = false;
 
+    // Speed Description
     private float maximalSpeed;
     public static final float BASE_MAX_SPEED = 3f / 1000f;    // 3 tiles per second
     public static final float MAX_SPEED_INCREMENT = 0.5f / 1000f; // 3.0 → 3.5 → 4 → 4.5 → 5.5 → 6.0/ Higher the harder. :)
