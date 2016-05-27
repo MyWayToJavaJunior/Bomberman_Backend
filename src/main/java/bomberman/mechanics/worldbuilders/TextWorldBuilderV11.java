@@ -36,7 +36,7 @@ public class TextWorldBuilderV11 implements IWorldBuilder {
                         final String nameWithoutExtension = blueprint.getName().substring(0, blueprint.getName().lastIndexOf('.'));
                         builders.put(nameWithoutExtension, new TextWorldBuilderV11(blueprint));
                     } catch (Exception ex) {
-                        LOGGER.error("Cannot build world from file\"" + blueprint.getAbsolutePath() + "\". It is corrupted.");
+                        LOGGER.info("Cannot build world from file\"" + blueprint.getAbsolutePath() + "\". Ignoring.");
                     }
 
         return builders;
@@ -68,10 +68,16 @@ public class TextWorldBuilderV11 implements IWorldBuilder {
 
             }
 
+            if (rawTiles.size() == MIN_HEIGHT || rawTiles.get(0).length() == MIN_WIDTH) {
+                LOGGER.error("World \"" + blueprint.getAbsolutePath() + "\" is too small! Make it at least " + MIN_WIDTH + 'x' + MIN_HEIGHT + '.');
+            }
+
         } catch (IOException ex) {
             LOGGER.error("Cannot read\"" + blueprint.getAbsolutePath() + "\" due to some weird reason! Check server's rights.");
+            throw ex;
         } catch (Exception ex) {
             LOGGER.info("World \"" + blueprint.getAbsolutePath() + "\" has version different version than " + CURRENT_VERSION);
+            throw ex;
         } finally {
             if (strings != null)
                 try {
@@ -159,5 +165,8 @@ public class TextWorldBuilderV11 implements IWorldBuilder {
     private static final Logger LOGGER = LogManager.getLogger(TextWorldBuilderV11.class);
     private static final String CURRENT_VERSION = "v1.1";
     private static final String EOF_TAG = "#EOF";
+
+    private static final int MIN_WIDTH = 2;
+    private static final int MIN_HEIGHT = 2;
 
 }

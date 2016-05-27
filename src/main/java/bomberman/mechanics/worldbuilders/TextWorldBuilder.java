@@ -28,14 +28,14 @@ public class TextWorldBuilder implements IWorldBuilder {
                         final String nameWithoutExtension = blueprint.getName().substring(0, blueprint.getName().lastIndexOf('.'));
                         builders.put(nameWithoutExtension, new TextWorldBuilder(blueprint));
                     } catch (Exception ex) {
-                        LOGGER.error("Cannot build world from file\"" + blueprint.getAbsolutePath() + "\". It is corrupted.");
+                        LOGGER.info("Cannot build world from file\"" + blueprint.getAbsolutePath() + "\". Ignoring.");
                     }
 
         return builders;
     }
 
     @SuppressWarnings("OverlyBroadThrowsClause")
-    public TextWorldBuilder(File blueprint) {
+    public TextWorldBuilder(File blueprint) throws Exception {
         BufferedReader strings = null;
         //noinspection OverlyBroadCatchBlock
         try {
@@ -52,8 +52,10 @@ public class TextWorldBuilder implements IWorldBuilder {
         }
         catch (IOException ex) {
             LOGGER.error("Cannot read\"" + blueprint.getAbsolutePath() + "\" due to some weird reason! Check server's rights.");
+            throw ex;
         } catch (Exception ex) {
             LOGGER.info("World \"" + blueprint.getAbsolutePath() + "\" has version different version than " + CURRENT_VERSION);
+            throw ex;
         } finally {
             if (strings != null)
                 try {
