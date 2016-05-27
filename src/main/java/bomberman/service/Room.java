@@ -75,7 +75,7 @@ public class Room {
         for (WorldEvent spawnEvent: worldSpawnDetails)
             transmit(spawnEvent, socket);
 
-        timeToKickMap.put(user, TIME_TO_KICK);
+        timeToKickMap.put(user, TimeHelper.now() + TIME_TO_KICK);
         websocketMap.put(user, socket);
         readinessMap.put(user, new Pair<>(false, false));
         broadcast(MessageCreator.createUserJoinedMessage(user, readinessMap.get(user).getValue0(), readinessMap.get(user).getValue1()));
@@ -227,7 +227,7 @@ public class Room {
             return true;
         } else
             if (!hasCountDownBegan.get())
-                kickPlayersIfNeeded(deltaT);
+                kickPlayersIfNeeded();
 
         return false;
     }
@@ -235,7 +235,7 @@ public class Room {
     public void refreshUserKickTimer(UserProfile user) {
         timeToKickMap.remove(user);
         if (websocketMap.containsKey(user))
-            timeToKickMap.put(user, TIME_TO_KICK);
+            timeToKickMap.put(user, TimeHelper.now() + TIME_TO_KICK);
     }
 
     private boolean willWorldStateChangeOnNextTick() {
@@ -286,20 +286,14 @@ public class Room {
 
     }
 
-    private void kickPlayersIfNeeded(long deltaT) {
+    private void kickPlayersIfNeeded() {
         final List<UserProfile> scheduledKicks = new LinkedList<>();
         if (!isActive.get() && !hasCountDownBegan.get())
-            for (Map.Entry<UserProfile, Integer> timeToKick: timeToKickMap.entrySet()) {
+            for (Map.Entry<UserProfile, Long> timeToKick: timeToKickMap.entrySet()) {
                 final UserProfile user = timeToKick.getKey();
 
                 if (user != null && !readinessMap.get(user).getValue0()){
-                    final int timeToKickLeft = timeToKick.getValue();
-
-                    timeToKickMap.remove(user);
-                    timeToKickMap.put(user, timeToKickLeft - (int) deltaT);
-                    LOGGER.debug("Player #" + user.getId() + " \"" + user.getLogin() + "\" has " + timeToKickMap.get(user) + " milliseconds before he will get kicked.");
-
-                    if (timeToKickMap.get(user) < 0)
+                    if (timeToKickMap.get(user) - TimeHelper.now() < 0)
                         scheduledKicks.add(user);
                 }
             }
@@ -352,7 +346,7 @@ public class Room {
     private final Map<UserProfile, Integer> reversePlayerMap = new ConcurrentHashMap<>(4);
     private final Map<UserProfile, MessageSendable> websocketMap = new ConcurrentHashMap<>(4);
     private final Map<UserProfile, Pair<Boolean, Boolean>> readinessMap = new ConcurrentHashMap<>(4);
-    private final Map<UserProfile, Integer> timeToKickMap = new ConcurrentHashMap<>(4);
+    private final Map<UserProfile, Long> timeToKickMap = new ConcurrentHashMap<>(4);
 
     private World world;
     private final AtomicBoolean isActive = new AtomicBoolean(false);

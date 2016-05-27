@@ -114,13 +114,13 @@ public class RoomManagerImpl implements RoomManager {
 
             final long totalUpdateTook = TimeHelper.now() - beforeUpdate;
 
-            if (!wereAnyRoomUpdated)
-                TimeHelper.sleepFor(100);
-            else
-                TimeHelper.sleepFor(Room.MINIMAL_TIME_STEP - totalUpdateTook);
+            TimeHelper.sleepFor(Room.MINIMAL_TIME_STEP - totalUpdateTook);
 
             previousTickDuration = TimeHelper.now() - beforeUpdate;
             logGameCycleTime(totalUpdateTook);
+
+            if (!wereAnyRoomUpdated)
+                TimeHelper.sleepFor(100);
         }
     }
 
