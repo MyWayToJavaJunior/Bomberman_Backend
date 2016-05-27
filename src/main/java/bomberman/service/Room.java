@@ -35,10 +35,11 @@ public class Room {
         id = ID_COUNTER.getAndIncrement();
     }
 
-    public void createNewWorld(String type)
-    {
+    public void createNewWorld(String type)    {
         world = new World(type);
+        capacity = world.getNumberOfSpawns();
         worldSpawnDetails = new LinkedList<>(world.getFreshEvents());
+
     }
 
     public void assignBombermenToPlayers() {

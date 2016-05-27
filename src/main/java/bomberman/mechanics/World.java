@@ -52,6 +52,10 @@ public class World {
         return ids;
     }
 
+    public int getNumberOfSpawns() {
+        return spawnLocations.length;
+    }
+
     public void spawnBombermen(int amount){
         if (spawnLocations.length < amount)
             throw new ArrayIndexOutOfBoundsException();
