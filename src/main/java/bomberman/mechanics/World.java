@@ -196,8 +196,8 @@ public class World {
         if (dx == 0 && dy == 0 || deltaT <= 0)
             return;
 
-        final int worldWidth = tileArray.length;
-        final int worldHeight = tileArray[0].length;
+        final int worldWidth = tileArray[0].length;
+        final int worldHeight = tileArray.length;
 
         final float x = actor.getCoordinates()[0];
         final int ix = (int) Math.floor(x);
