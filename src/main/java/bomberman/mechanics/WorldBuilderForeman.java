@@ -25,8 +25,9 @@ public class WorldBuilderForeman {
         final Set<Map.Entry<String, IWorldBuilder>> builderSet = BUILDERS.entrySet();
         final ArrayList<String> names = builderSet.stream().map(Map.Entry::getKey).collect(Collectors.toCollection(ArrayList::new));
 
-        final Random randomInt = new Random(new Date().hashCode());
-        return names.get(Math.abs(randomInt.nextInt()) % names.size());
+        if (lastWorldNum == names.size())
+            lastWorldNum = 0;
+        return names.get(lastWorldNum++);
     }
 
     private static Map<String, IWorldBuilder> collectBuilders() {
@@ -42,4 +43,5 @@ public class WorldBuilderForeman {
 
     private static final Map<String, IWorldBuilder> BUILDERS = collectBuilders();
     private static final Logger LOGGER = LogManager.getLogger(WorldBuilderForeman.class);
+    private static Integer lastWorldNum = 0;
 }
