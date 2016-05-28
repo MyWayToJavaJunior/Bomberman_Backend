@@ -121,10 +121,10 @@ public class DataBaseServiceMySQLImpl implements DataBaseService, AutoCloseable 
 
     @Override
     @Nullable
-    public UserProfile addUser(String login, String password) {
+    public UserProfile addUser(String login, String password, boolean isGuest) {
         if (containsLogin(login))
             return null;
-        final UserProfileData newUser = new UserProfileData(login, password);
+        final UserProfileData newUser = new UserProfileData(login, password, isGuest);
         save(newUser);
         return getByLogin(login);
     }

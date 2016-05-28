@@ -16,7 +16,7 @@ public class DataBaseServiceHashMapImpl implements DataBaseService {
 
     @Override
     @Nullable
-    public UserProfile addUser(String login, String password) {
+    public UserProfile addUser(String login, String password, boolean isGuest) {
         if (containsLogin(login))
             return null;
         final UserProfileData newUserData = new UserProfileData(login, password);

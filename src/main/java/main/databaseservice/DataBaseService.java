@@ -21,7 +21,7 @@ public interface DataBaseService {
     Collection<UserProfile> getTop10Users();
 
     @Nullable
-    UserProfile addUser(String login, String password);
+    UserProfile addUser(String login, String password, boolean isGuest);
 
     boolean containsID(Long id);
 

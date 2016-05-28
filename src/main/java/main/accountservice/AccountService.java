@@ -17,7 +17,7 @@ public interface AccountService {
     boolean logoutUser(@Nullable String sessionID);
 
     @Nullable
-    UserProfile createNewUser(@NotNull String login, @NotNull String password);
+    UserProfile createNewUser(@NotNull String login, @NotNull String password, boolean isGuest);
 
     @Nullable
     Collection<UserProfile> getAllUsers();

@@ -9,9 +9,10 @@ import org.jetbrains.annotations.Nullable;
 @Table(name = "users")
 public class UserProfileData implements Serializable {
 
-    public UserProfileData(@NotNull String newLogin, @NotNull String newPasssword) {
+    public UserProfileData(@NotNull String newLogin, @NotNull String newPasssword, boolean isGuest) {
         login = newLogin;
         password = newPasssword;
+        this.isGuest = isGuest;
     }
 
     public UserProfileData() {}
@@ -71,6 +72,9 @@ public class UserProfileData implements Serializable {
         } else return false;
     }
 
+    public boolean isGuest() {
+        return isGuest;
+    }
 
     @Id
     @Column(name = "user_id")
@@ -91,6 +95,9 @@ public class UserProfileData implements Serializable {
     @Nullable
     @Column(name = "user_pic_path")
     private String userpicPath = null;
+
+    @Column(name = "is_guest")
+    private boolean isGuest = false;
 
     @SuppressWarnings("unused")
     private static final long serialVersionUID = -8706689714326132798L;

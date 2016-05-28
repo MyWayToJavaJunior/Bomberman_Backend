@@ -43,10 +43,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Nullable
-    public UserProfile createNewUser(@NotNull String login,@NotNull String password) {
+    public UserProfile createNewUser(@NotNull String login,@NotNull String password, boolean isGuest) {
         if (registeredUsers.containsLogin(login))
             return null;
-        return registeredUsers.addUser(login, password);
+        return registeredUsers.addUser(login, password, isGuest);
     }
 
     @Override

@@ -63,15 +63,17 @@ public class Users {
 
         final String login;
         final String password;
+        final boolean isGuest;
         final JSONArray errorList = WebErrorManager.showFieldsNotPresent(jsonRequest, "login","password");
         if (errorList == null){
             login = jsonRequest.get("login").toString();
             password = jsonRequest.get("password").toString();
+            isGuest = (jsonRequest.has("isGuest")) && jsonRequest.getBoolean("isGuest");
         }
         else
             return WebErrorManager.accessForbidden(errorList);
 
-        final UserProfile newUser = accountService.createNewUser(login, password);
+        final UserProfile newUser = accountService.createNewUser(login, password, isGuest);
         if (newUser != null) {
             accountService.loginUser(newUser);
             return Response.ok(new JSONObject().put("id", newUser.getId()).toString()).cookie(UserTokenManager.getNewCookieWithSessionID(newUser.getSessionID())).build();
