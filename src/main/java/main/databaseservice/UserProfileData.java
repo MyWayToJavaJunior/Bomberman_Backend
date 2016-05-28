@@ -12,7 +12,7 @@ public class UserProfileData implements Serializable {
     public UserProfileData(@NotNull String newLogin, @NotNull String newPasssword, boolean isGuest) {
         login = newLogin;
         password = newPasssword;
-        this.isGuest = isGuest;
+        this.isGuest = isGuest ? 1 : 0;
     }
 
     public UserProfileData() {}
@@ -73,7 +73,7 @@ public class UserProfileData implements Serializable {
     }
 
     public boolean isGuest() {
-        return isGuest;
+        return isGuest != 0;
     }
 
     @Id
@@ -97,7 +97,7 @@ public class UserProfileData implements Serializable {
     private String userpicPath = null;
 
     @Column(name = "is_guest")
-    private boolean isGuest = false;
+    private int isGuest = 0;
 
     @SuppressWarnings("unused")
     private static final long serialVersionUID = -8706689714326132798L;
