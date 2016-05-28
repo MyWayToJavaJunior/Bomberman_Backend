@@ -19,7 +19,7 @@ public class DataBaseServiceHashMapImpl implements DataBaseService {
     public UserProfile addUser(String login, String password, boolean isGuest) {
         if (containsLogin(login))
             return null;
-        final UserProfileData newUserData = new UserProfileData(login, password);
+        final UserProfileData newUserData = new UserProfileData(login, password, isGuest);
         newUserData.setId(idCounter.incrementAndGet());
         final UserProfile newUser = new UserProfile(newUserData);
         loginToUser.put(login, newUser);
