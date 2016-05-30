@@ -57,7 +57,7 @@ public class WebSocketConnection implements MessageSendable{
         //noinspection OverlyBroadCatchBlock
         try {
             if (session.isOpen())
-                session.getRemote().sendString(message);
+                session.getRemote().sendStringByFuture(message);
         } catch (Exception ex) {
             LOGGER.error("Could not send message to user #" + user.getId() + " (\"" + user.getLogin() + "\")!", ex);
         }
