@@ -45,8 +45,6 @@ public class TileFactory {
                 return newBonusIncreaseMaxHP(id, list);
             case BONUS_INCMAXRANGE:
                 return newBonusIncreaseBombRange(id, list);
-            case BONUS_DECBOMBFUSE:
-                return newBonusDecreaseExplosionDelay(id, list);
             case BONUS_DECBOMBSPAWN:
                 return newBonusDecreaseSpawnDelay(id, list);
             case BONUS_INCSPEED:
@@ -104,9 +102,6 @@ public class TileFactory {
     }
     private ITile newBonusDecreaseSpawnDelay(int id, World list){
         return new ActionTile(id, new DecreaseBombSpawnDelayFunctor(list), new NullBehavior(list), EntityType.BONUS_DECBOMBSPAWN);
-    }
-    private ITile newBonusDecreaseExplosionDelay(int id, World list){
-        return new ActionTile(id, new DecreaseBombExplosionDelayFunctor(list), new NullBehavior(list), EntityType.BONUS_DECBOMBFUSE);
     }
     private ITile newBonusIncreaseBombermanSpeed(int id, World list){
         return new ActionTile(id, new IncreaseSpeedFunctor(list), new NullBehavior(list), EntityType.BONUS_INCSPEED);

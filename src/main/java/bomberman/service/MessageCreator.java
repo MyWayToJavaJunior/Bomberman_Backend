@@ -67,8 +67,8 @@ public class MessageCreator {
             case BONUS_DECBOMBSPAWN:
                 objectType = "bonus_decrease_bomb_spawn_delay";
                 break;
-            case BONUS_DECBOMBFUSE:
-                objectType = "bonus_decrease_bomb_explosion_delay";
+            case BONUS_INVUL:
+                objectType = "bonus_invulnerability";
                 break;
             case BONUS_INCSPEED:
                 objectType = "bonus_increase_speed";

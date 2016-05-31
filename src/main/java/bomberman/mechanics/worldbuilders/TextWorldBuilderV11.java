@@ -133,8 +133,6 @@ public class TextWorldBuilderV11 implements IWorldBuilder {
                 return TileFactory.getInstance().getNewTile(EntityType.UNDESTRUCTIBLE_WALL, supplicant.getNextID());
             case 'd':
                 return TileFactory.getInstance().getNewTile(EntityType.DESTRUCTIBLE_WALL, supplicant.getNextID());
-            case 'E':
-                return TileFactory.getInstance().getNewTile(EntityType.BONUS_DECBOMBFUSE, supplicant, supplicant.getNextID());
             case 'P':
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_DECBOMBSPAWN, supplicant, supplicant.getNextID());
             case 'R':
