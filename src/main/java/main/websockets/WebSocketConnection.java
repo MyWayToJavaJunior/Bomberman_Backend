@@ -50,6 +50,7 @@ public class WebSocketConnection implements MessageSendable{
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         roomManager.removeUserFromRoom(user);
+        LOGGER.error("Removed user #" + user.getId() + " (\"" + user.getLogin() + "\")!");
     }
 
     @Override
@@ -57,7 +58,7 @@ public class WebSocketConnection implements MessageSendable{
         //noinspection OverlyBroadCatchBlock
         try {
             if (session.isOpen())
-                session.getRemote().sendStringByFuture(message);
+                session.getRemote().sendString(message);
         } catch (Exception ex) {
             LOGGER.error("Could not send message to user #" + user.getId() + " (\"" + user.getLogin() + "\")!", ex);
         }
