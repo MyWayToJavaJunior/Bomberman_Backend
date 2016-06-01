@@ -324,10 +324,10 @@ public class Room {
                     final UserProfile deadOne = playerMap.get(event.getEntityID());
 
                     if (deadOne != null)
-                        accountService.updateScore(deadOne, -SCORE_ON_BOMBRMAN_KILL);
+                        accountService.updateScore(deadOne, -SCORE_ON_BOMBERMAN_KILL);
 
                     if (deadOne != null && !deadOne.equals(initiator))
-                        accountService.updateScore(initiator, SCORE_ON_BOMBRMAN_KILL);
+                        accountService.updateScore(initiator, SCORE_ON_BOMBERMAN_KILL);
                 }
             }
         }
@@ -366,7 +366,7 @@ public class Room {
     public static final int TIME_TO_KICK = 30_000; // 30 seconds
 
     public static final int SCORE_ON_GAME_WON = 500;
-    public static final int SCORE_ON_BOMBRMAN_KILL = 100;
+    public static final int SCORE_ON_BOMBERMAN_KILL = 100;
     public static final int SCORE_ON_BONUS_PICKED_UP = 2;
     public static final int SCORE_ON_WALL_BROKEN = 1;
 

@@ -127,7 +127,7 @@ public class RoomManagerImpl implements RoomManager {
     private void logGameCycleTime(long timeSpentWhileRunning) {
         if (timeSpentWhileRunning >= Room.MINIMAL_TIME_STEP)
             LOGGER.warn("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " >= " + Room.MINIMAL_TIME_STEP + "! Fix the bugs!");
-        else
+        else if (timeSpentWhileRunning != 0)
             LOGGER.debug("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " < " + Room.MINIMAL_TIME_STEP + ". OK.");
     }
 
