@@ -153,14 +153,14 @@ public class Room {
     }
 
     public void scheduleBombermanMovement(UserProfile user, int dirX, int dirY) {
-        if (isActive.get() && !isFinished && reversePlayerMap.containsKey(user)) {
+        if (isActive.get() && !isFinished.get() && reversePlayerMap.containsKey(user)) {
             final int bombermanID = reversePlayerMap.get(user);
                 scheduledActions.add(new WorldEvent(EventType.ENTITY_UPDATED, EntityType.BOMBERMAN, bombermanID, dirX, dirY, null, TimeHelper.now()));  // TODO: Should TimeHelper.now() be client's timestamp?
         }
     }
 
     public void scheduleBombPlacement(UserProfile user) {
-        if (isActive.get() && !isFinished && reversePlayerMap.containsKey(user)) {
+        if (isActive.get() && !isFinished.get() && reversePlayerMap.containsKey(user)) {
             final int bombermanID = reversePlayerMap.get(user);
 
             scheduledActions.add(new WorldEvent(EventType.TILE_SPAWNED, EntityType.BOMB, bombermanID, 0, 0, null));
@@ -224,7 +224,7 @@ public class Room {
     // http://gafferongames.com/game-physics/fix-your-timestep/
     // Variable delta time variant
     public boolean updateIfNeeded(long deltaT) {
-        if (isActive.get() && !isFinished && willWorldStateChangeOnNextTick()) {
+        if (isActive.get() && !isFinished.get() && willWorldStateChangeOnNextTick()) {
             update(deltaT);
             return true;
         } else
@@ -256,13 +256,14 @@ public class Room {
 
         playerMap.remove(bombermanID);
         reversePlayerMap.remove(user);
+        accountService.updateUser(user);
     }
 
     private void stopIfGameIsOver() {
         if (world.getBombermanCount() == 1) {
             TimeHelper.executeAfter(TIME_TO_WAIT_ON_GAME_OVER, () -> {
-                if (!isFinished && world.getBombermanCount() == 1) {
-                    isFinished = true;
+                if (!isFinished.get() && world.getBombermanCount() == 1) {
+                    isFinished.compareAndSet(false, true);
 
                     if (accountService != null)
                         accountService.updateScore(playerMap.get(world.getBombermenIDs()[0]), SCORE_ON_GAME_WON);
@@ -272,7 +273,7 @@ public class Room {
             });
         }
         if (world.getBombermanCount() == 0) {
-            isFinished = true;
+            isFinished.compareAndSet(false, true);
             broadcast(MessageCreator.createGameOverMessage(null));
         }
     }
@@ -353,7 +354,7 @@ public class Room {
     private World world;
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
-    private volatile boolean isFinished = false;
+    private final AtomicBoolean isFinished = new AtomicBoolean(false);
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
     private final Queue<WorldEvent> scheduledActions = new ConcurrentLinkedQueue<>();
