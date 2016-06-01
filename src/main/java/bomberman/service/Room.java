@@ -88,6 +88,7 @@ public class Room {
 
     public synchronized void removePlayer(UserProfile user) {
         if (websocketMap.containsKey(user)) {
+            accountService.updateUser(user);
             broadcast(MessageCreator.createUserLeftMessage(user));
 
             websocketMap.remove(user);

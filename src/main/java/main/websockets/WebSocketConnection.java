@@ -50,7 +50,7 @@ public class WebSocketConnection implements MessageSendable{
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         roomManager.removeUserFromRoom(user);
-        LOGGER.error("Removed user #" + user.getId() + " (\"" + user.getLogin() + "\")!");
+        LOGGER.error("Closed socket with session \"" + session + "\" for user user #" + user.getId() + " (\"" + user.getLogin() + "\")!");
     }
 
     @Override

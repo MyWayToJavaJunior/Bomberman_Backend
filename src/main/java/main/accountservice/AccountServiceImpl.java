@@ -94,7 +94,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateScore(UserProfile user, int delta) {
         user.setScore(user.getScore() + delta);
-        registeredUsers.save(user.getData());
+        //registeredUsers.save(user.getData());
     }
 
     private final Map<String, Long> activeUsers = new HashMap<>();
