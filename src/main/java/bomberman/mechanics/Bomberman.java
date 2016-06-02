@@ -74,12 +74,16 @@ public class Bomberman implements IEntity {
         if (health > maxHealth)
             health = maxHealth;
 
-        if (amount < 0) {
-            if (invulnerabilityTimer <= 0)
+        if (amount > 0) {
+            if (invulnerabilityTimer <= 0) {
                 health -= amount;
-            activateInvulnerabilityTimer();
-        } else
+                activateInvulnerabilityTimer();
+            }
+        } else {
             health -= amount;
+            if (health > maxHealth)
+                health = maxHealth;
+        }
 
         if (health <= 0)
             world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, initiator, TimeHelper.now()));
