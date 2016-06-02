@@ -4,6 +4,8 @@ import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
 import bomberman.mechanics.interfaces.IEntity;
 import bomberman.service.TimeHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.javatuples.Triplet;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,10 +56,10 @@ public class Bomberman implements IEntity {
     @Override
     public void update(long deltaT) {
         if (bombSpawnTimer >= 0)
-            bombSpawnTimer =- deltaT;
+            bombSpawnTimer -= deltaT;
 
         if (invulnerabilityTimer >= 0)
-            invulnerabilityTimer = -deltaT;
+            invulnerabilityTimer -= deltaT;
     }
 
     public boolean canSpawnBomb() {
@@ -75,18 +77,25 @@ public class Bomberman implements IEntity {
             health = maxHealth;
 
         if (amount > 0) {
+            LOGGER.debug("Damaging bomberman \"" + this + "\" for " + amount + " hp.");
             if (invulnerabilityTimer <= 0) {
                 health -= amount;
                 activateInvulnerabilityTimer();
+                LOGGER.debug("Damaged bomberman \"" + this + "\". Now he has " + health + " hp. Activating invulnerability.");
+            } else  {
+                LOGGER.debug("Could not damage bomberman \"" + this + "\". He had invulnerability activated.");
             }
         } else {
+            LOGGER.debug("Healing bomberman \"" + this + "\" for " + -amount + " hp.");
             health -= amount;
             if (health > maxHealth)
                 health = maxHealth;
         }
 
-        if (health <= 0)
+        if (health <= 0) {
+            LOGGER.debug("Bomberman \"" + this + "\" has died.");
             world.addWorldEvent(new WorldEvent(EventType.TILE_REMOVED, EntityType.BOMBERMAN, id, x, y, initiator, TimeHelper.now()));
+        }
     }
 
     public void increaseMaxHealth() {
@@ -253,4 +262,6 @@ public class Bomberman implements IEntity {
     private final Queue<Triplet<Float, Float, Long>> movementsDuringTick = new LinkedList<>();
 
     public static final float DIAMETER = 0.75f; // ¾ of a tile.
+
+    private static final Logger LOGGER = LogManager.getLogger(Bomberman.class);
 }
