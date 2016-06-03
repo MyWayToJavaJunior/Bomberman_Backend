@@ -429,7 +429,8 @@ public class World {
     }
 
     private void decideToSpawnRandomBonus(int x, int y) {
-        if (randomizer.nextInt() % 100 + 1 < PERCENT_TO_SPAWN_BONUS) {
+        System.out.print(randomizer.nextInt(100));
+        if (randomizer.nextInt(100) < PERCENT_TO_SPAWN_BONUS) {
             final EntityType type;
             switch (Math.abs(randomizer.nextInt() % TileFactory.getBonusCount())) {
                 case 0:
@@ -518,7 +519,7 @@ public class World {
     private final Queue<Pair<WorldEvent, Long>> delayedEventQueue = new ConcurrentLinkedQueue<>();
 
     private final AtomicInteger uidManager = new AtomicInteger(0);
-    private final Random randomizer = new Random(TimeHelper.now());
+    private final Random randomizer = new Random();
 
     private final String name;
 
@@ -530,7 +531,7 @@ public class World {
     private int selfUpdatingEntities = 0;
 
     public static final float ACTION_TILE_HANDICAP_DIAMETER = 0.05f; // 0.75-0.05 will
-    public static final int PERCENT_TO_SPAWN_BONUS = 15;
+    public static final int PERCENT_TO_SPAWN_BONUS = 20;
 
     private static final Logger LOGGER = LogManager.getLogger(World.class);
 }
