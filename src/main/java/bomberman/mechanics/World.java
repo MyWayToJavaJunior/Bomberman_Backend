@@ -530,7 +530,7 @@ public class World {
     private int selfUpdatingEntities = 0;
 
     public static final float ACTION_TILE_HANDICAP_DIAMETER = 0.05f; // 0.75-0.05 will
-    public static final int PERCENT_TO_SPAWN_BONUS = 25;
+    public static final int PERCENT_TO_SPAWN_BONUS = 15;
 
     private static final Logger LOGGER = LogManager.getLogger(World.class);
 }
