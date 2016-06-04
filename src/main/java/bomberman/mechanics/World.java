@@ -429,7 +429,6 @@ public class World {
     }
 
     private void decideToSpawnRandomBonus(int x, int y) {
-        System.out.print(randomizer.nextInt(100));
         if (randomizer.nextInt(100) < PERCENT_TO_SPAWN_BONUS) {
             final EntityType type;
             switch (Math.abs(randomizer.nextInt() % TileFactory.getBonusCount())) {
