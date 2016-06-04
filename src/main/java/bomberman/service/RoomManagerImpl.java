@@ -21,7 +21,7 @@ public class RoomManagerImpl implements RoomManager {
     }
 
     @Override
-    public Room assignUserToFreeRoom(UserProfile user, MessageSendable socket) {
+    public synchronized Room assignUserToFreeRoom(UserProfile user, MessageSendable socket) {
         removeUserFromRoom(user);
 
         Room room = getNonFilledNotActiveRoom();
