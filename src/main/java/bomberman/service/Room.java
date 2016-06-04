@@ -51,6 +51,8 @@ public class Room {
             reversePlayerMap.put(player.getKey(), bombermen[i]);
             ++i;
         }
+        if (shouldHaveBots.get())
+            world.spawnBots();
     }
 
     public int getCurrentCapacity() {
@@ -359,6 +361,7 @@ public class Room {
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
     private final AtomicBoolean isFinished = new AtomicBoolean(false);
+    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(true);
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
     private final Queue<WorldEvent> scheduledActions = new ConcurrentLinkedQueue<>();
@@ -367,7 +370,7 @@ public class Room {
     public static final int DEFAULT_CAPACITY = 4;
     public static final int TIME_TO_WAIT_AFTER_READY = 3000; // ms
     public static final int TIME_TO_WAIT_ON_GAME_OVER = 1500; // ms
-    public static final int TIME_TO_KICK = 30_000; // 30 seconds
+    public static final int TIME_TO_KICK = 60_000; // 1 minute
 
     public static final int SCORE_ON_GAME_WON = 500;
     public static final int SCORE_ON_BOMBERMAN_KILL = 100;

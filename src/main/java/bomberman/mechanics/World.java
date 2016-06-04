@@ -67,6 +67,16 @@ public class World {
         }
     }
 
+    public void spawnBots() {
+        final int numberOfBotsToBeSpawned = spawnLocations.length - bombermen.size();
+        for (int i = bombermen.size(); i < numberOfBotsToBeSpawned; ++i) {
+            final Bomberman newBomberman = new BombermanBot(getNextID(), this, spawnLocations[i]);
+            newBomberman.setCoordinates(spawnLocations[i]);
+            bombermen.add(newBomberman);
+            processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, newBomberman.getType(), newBomberman.getID(), spawnLocations[i][0], spawnLocations[i][1], null));
+        }
+    }
+
     public String getName() {
         return name;
     }
