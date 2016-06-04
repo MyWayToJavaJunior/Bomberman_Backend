@@ -138,7 +138,8 @@ public class Room {
     }
 
     private void startGameIfEveryoneIsReady() {
-        if (websocketMap.size() > 1 && hasEveryoneLoadedContent.get() && isEveryoneReady.get()) {
+        //noinspection OverlyComplexBooleanExpression
+        if ((websocketMap.size() > 1 || shouldHaveBots.get()) && hasEveryoneLoadedContent.get() && isEveryoneReady.get()) {
             hasCountDownBegan.compareAndSet(false, true);
             TimeHelper.executeAfter(TIME_TO_WAIT_AFTER_READY, () ->
             {
