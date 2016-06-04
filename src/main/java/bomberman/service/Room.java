@@ -127,6 +127,11 @@ public class Room {
             if (!entry.getValue().getValue1())
                 hasEveryoneLoadedContentTMP = false;
         }
+        if (readinessMap.isEmpty()) {
+            hasEveryoneLoadedContentTMP = false;
+            isEveryoneReadyTMP = false;
+        }
+
         isEveryoneReady.compareAndSet(!isEveryoneReadyTMP, isEveryoneReadyTMP);
         hasEveryoneLoadedContent.compareAndSet(!hasEveryoneLoadedContentTMP, hasEveryoneLoadedContentTMP);
 
@@ -139,7 +144,7 @@ public class Room {
             {
                 recalculateReadiness();
                 //noinspection OverlyComplexBooleanExpression
-                if (websocketMap.size() > 1 && hasEveryoneLoadedContent.get() && isEveryoneReady.get() && !isActive.get()) {
+                if ((websocketMap.size() > 1 || shouldHaveBots.get()) && hasEveryoneLoadedContent.get() && isEveryoneReady.get() && !isActive.get()) {
                     assignBombermenToPlayers();
                     transmitEventsOnWorldCreation();
                     broadcast(MessageCreator.createWorldCreatedMessage(world.getName(), world.getWidth(), world.getHeight()));
