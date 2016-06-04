@@ -24,9 +24,11 @@ public class RoomManagerImpl implements RoomManager {
     public Room assignUserToFreeRoom(UserProfile user, MessageSendable socket) {
         removeUserFromRoom(user);
 
-        final Room room = getNonFilledNotActiveRoom();
+        Room room = getNonFilledNotActiveRoom();
 
-        room.insertPlayer(user, socket);
+        while (!room.insertPlayer(user, socket)) {
+            room = getNonFilledNotActiveRoom();
+        }
         playerWhereabouts.put(user, room);
         if (room.isFilled())
             nonFilledRooms.remove();
@@ -128,7 +130,7 @@ public class RoomManagerImpl implements RoomManager {
         if (timeSpentWhileRunning >= Room.MINIMAL_TIME_STEP)
             LOGGER.warn("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " >= " + Room.MINIMAL_TIME_STEP + "! Fix the bugs!");
         else if (timeSpentWhileRunning != 0)
-            LOGGER.debug("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " < " + Room.MINIMAL_TIME_STEP + ". OK.");
+            LOGGER.info("RoomManager " + this.toString() + " updated. It took " + timeSpentWhileRunning + " < " + Room.MINIMAL_TIME_STEP + ". OK.");
     }
 
     private AccountService accountService;

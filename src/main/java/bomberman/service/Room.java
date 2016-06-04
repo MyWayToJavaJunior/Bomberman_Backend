@@ -66,7 +66,10 @@ public class Room {
         return websocketMap.isEmpty();
     }
 
-    public synchronized void insertPlayer(UserProfile user, MessageSendable socket) {
+    public synchronized boolean insertPlayer(UserProfile user, MessageSendable socket) {
+        if (isFilled())
+            return false;
+
         isEveryoneReady.getAndSet(false);
         hasEveryoneLoadedContent.getAndSet(false);
 
@@ -80,6 +83,7 @@ public class Room {
         websocketMap.put(user, socket);
         readinessMap.put(user, new Pair<>(false, false));
         broadcast(MessageCreator.createUserJoinedMessage(user, readinessMap.get(user).getValue0(), readinessMap.get(user).getValue1()));
+        return true;
     }
 
     public boolean hasPlayer(UserProfile user) {

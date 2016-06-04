@@ -80,11 +80,11 @@ public class Bomberman implements IEntity {
             LOGGER.debug("Damaging bomberman \"" + this + "\" for " + amount + " hp.");
             if (invulnerabilityTimer <= 0) {
                 health -= amount;
+                activateInvulnerabilityTimer();
                 LOGGER.debug("Damaged bomberman \"" + this + "\". Now he has " + health + " hp. Activating invulnerability.");
             } else  {
                 LOGGER.debug("Could not damage bomberman \"" + this + "\". He had invulnerability activated.");
             }
-            activateInvulnerabilityTimer();
         } else {
             LOGGER.debug("Healing bomberman \"" + this + "\" for " + -amount + " hp.");
             health -= amount;
@@ -111,12 +111,8 @@ public class Bomberman implements IEntity {
         return health;
     }
 
-    public void activateInvulnerabilityTimerBonus() {
+    public void activateInvulnerabilityTimer() {
         invulnerabilityTimer = INVULNERABILITY_TIME * 1000;
-    }
-
-    private void activateInvulnerabilityTimer() {
-        invulnerabilityTimer = INVULNERABILITY_TIME;
     }
 
     //
