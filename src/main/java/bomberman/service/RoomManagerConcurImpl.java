@@ -50,6 +50,16 @@ public class RoomManagerConcurImpl implements RoomManager {
         return roomManagers[lastManager].getCurrentRoom();
     }
 
+    @Override
+    public Collection<Room> getRoomList() {
+        final List<Room> list = new LinkedList<>();
+
+        for (RoomManager roomManager: roomManagers)
+            list.addAll(roomManager.getRoomList());
+
+        return list;
+    }
+
     public static final int DEFAULT_THREADS_AMOUNT = 4;
 
     private int lastManager = 0;

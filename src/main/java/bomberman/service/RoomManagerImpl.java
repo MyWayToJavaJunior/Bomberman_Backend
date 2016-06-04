@@ -53,6 +53,11 @@ public class RoomManagerImpl implements RoomManager {
         }
     }
 
+    @Override
+    public Collection<Room> getRoomList() {
+        return new LinkedList<>(allRooms);
+    }
+
     private Room getNonFilledNotActiveRoom() {
         while (true) {
             final Room room = nonFilledRooms.peek();
