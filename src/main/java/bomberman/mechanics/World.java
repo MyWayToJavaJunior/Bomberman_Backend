@@ -68,12 +68,13 @@ public class World {
     }
 
     public void spawnBots() {
+        final int bombermenAlreadySpawned = bombermen.size();
         final int numberOfBotsToBeSpawned = spawnLocations.length - bombermen.size();
-        for (int i = bombermen.size(); i < numberOfBotsToBeSpawned; ++i) {
-            final Bomberman newBomberman = new BombermanBot(getNextID(), this, spawnLocations[i]);
-            newBomberman.setCoordinates(spawnLocations[i]);
+        for (int i = 0; i < numberOfBotsToBeSpawned; ++i) {
+            final Bomberman newBomberman = new BombermanBot(getNextID(), this, spawnLocations[i + bombermenAlreadySpawned]);
+            newBomberman.setCoordinates(spawnLocations[i + bombermenAlreadySpawned]);
             bombermen.add(newBomberman);
-            processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, newBomberman.getType(), newBomberman.getID(), spawnLocations[i][0], spawnLocations[i][1], null));
+            processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, newBomberman.getType(), newBomberman.getID(), spawnLocations[i + bombermenAlreadySpawned][0], spawnLocations[i + bombermenAlreadySpawned][1], null));
         }
     }
 
@@ -91,18 +92,6 @@ public class World {
 
     public boolean shouldBeUpdated() {
         return selfUpdatingEntities > 0 || !newEventQueue.isEmpty() || !delayedEventQueue.isEmpty();
-    }
-
-    // Run only once at the very beginning
-    private void registerNewTiles() {
-        for (int y = 0; y < tileArray.length; ++y) {
-            final ITile[] row = tileArray[y];
-            for (int x = 0; x < tileArray[y].length; ++x) {
-                final ITile tile = row[x];
-                if (tile != null)
-                    processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, tile.getType(), tile.getID(), x, y, null));
-            }
-        }
     }
 
     public void runGameLoop(long deltaT) {
@@ -131,9 +120,33 @@ public class World {
         return bombermen.size();
     }
 
+    //// For bot
+
+    public ITile[][] getTiles() {
+        return tileArray;
+    }
+
+    public ArrayList<Bomberman> getBombermen() {
+        return bombermen;
+    }
+
+    ////
+
     private void processEntityUpdatedEvent(WorldEvent event) {
         LOGGER.debug("Processing object_updated");
         assignBombermanMovement(event);
+    }
+
+    // Run only once at the very beginning
+    private void registerNewTiles() {
+        for (int y = 0; y < tileArray.length; ++y) {
+            final ITile[] row = tileArray[y];
+            for (int x = 0; x < tileArray[y].length; ++x) {
+                final ITile tile = row[x];
+                if (tile != null)
+                    processedEventQueue.add(new WorldEvent(EventType.TILE_SPAWNED, tile.getType(), tile.getID(), x, y, null));
+            }
+        }
     }
 
     private void processTileSpawnedEvent(WorldEvent event) {

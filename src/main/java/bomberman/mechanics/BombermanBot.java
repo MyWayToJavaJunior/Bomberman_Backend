@@ -1,27 +1,22 @@
 package bomberman.mechanics;
 
-import bomberman.mechanics.interfaces.EntityType;
-import bomberman.mechanics.interfaces.EventType;
-import bomberman.mechanics.interfaces.IEntity;
-import bomberman.service.TimeHelper;
+import bomberman.mechanics.interfaces.Updateable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.javatuples.Triplet;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class BombermanBot extends Bomberman {
 
     public BombermanBot(int id, World world, float[] spawnCoordinates) {
         super(id, world, spawnCoordinates);
+        behavior = new SimpleBotBehavior(this, world);
     }
 
     @Override
     public void update(long deltaT) {
         super.update(deltaT);
+        behavior.update(deltaT);
     }
 
+    private final Updateable behavior;
     private static final Logger LOGGER = LogManager.getLogger(BombermanBot.class);
 }

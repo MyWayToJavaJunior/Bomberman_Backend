@@ -3,6 +3,7 @@ package bomberman.mechanics;
 import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
 import bomberman.mechanics.interfaces.IEntity;
+import bomberman.mechanics.interfaces.Updateable;
 import bomberman.service.TimeHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Bomberman implements IEntity {
+public class Bomberman implements IEntity, Updateable {
 
     public Bomberman(int id, World world, float[] spawnCoordinates) {
         this.id = id;

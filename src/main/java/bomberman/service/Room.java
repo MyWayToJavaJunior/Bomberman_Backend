@@ -157,6 +157,8 @@ public class Room {
                     assignBombermenToPlayers();
                     transmitEventsOnWorldCreation();
                     broadcast(MessageCreator.createWorldCreatedMessage(world.getName(), world.getWidth(), world.getHeight()));
+                    if (websocketMap.size() == 1 && shouldHaveBots.get())
+                        isSinglePlayer = true;
                 } else
                     hasCountDownBegan.compareAndSet(true, false);
             });
@@ -228,8 +230,13 @@ public class Room {
                     broadcast(MessageCreator.createObjectChangedMessage(event));
                     break;
                 case TILE_SPAWNED:
-                    if (event.getEntityType() == EntityType.BOMBERMAN)
-                        broadcast(MessageCreator.createBombermanSpawnedMessage(event, (int) playerMap.get(event.getEntityID()).getId()));
+                    if (event.getEntityType() == EntityType.BOMBERMAN) {
+                        int playerID = -1;
+                        if (playerMap.containsKey(event.getEntityID()))
+                            playerID = (int) playerMap.get(event.getEntityID()).getId();
+
+                        broadcast(MessageCreator.createBombermanSpawnedMessage(event, playerID));
+                    }
                     else
                         broadcast(MessageCreator.createObjectSpawnedMessage(event));
                     break;
@@ -282,7 +289,7 @@ public class Room {
     }
 
     private void stopIfGameIsOver() {
-        if (world.getBombermanCount() == 1) {
+        if (world.getBombermanCount() == 1 && !isSinglePlayer) {
             TimeHelper.executeAfter(TIME_TO_WAIT_ON_GAME_OVER, () -> {
                 if (!isFinished.get() && world.getBombermanCount() == 1) {
                     isFinished.compareAndSet(false, true);
@@ -330,7 +337,7 @@ public class Room {
     }
 
     private void rewardPlayers(WorldEvent event) {
-        if (event.getInitiator() != null && event.getEventType() == EventType.TILE_REMOVED) {
+        if (event.getInitiator() != null && event.getEventType() == EventType.TILE_REMOVED && !isSinglePlayer) {
             final UserProfile initiator = playerMap.get(event.getInitiator());
 
             if (initiator != null) {
@@ -365,6 +372,7 @@ public class Room {
 
     private final int id;
     private int capacity = DEFAULT_CAPACITY;
+    private boolean isSinglePlayer = false;
     private final AtomicBoolean isEveryoneReady = new AtomicBoolean(false);
     private final AtomicBoolean hasEveryoneLoadedContent = new AtomicBoolean(false);
 
@@ -378,7 +386,7 @@ public class Room {
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
     private final AtomicBoolean isFinished = new AtomicBoolean(false);
-    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(false);
+    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(true);
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
     private final Queue<WorldEvent> scheduledActions = new ConcurrentLinkedQueue<>();
