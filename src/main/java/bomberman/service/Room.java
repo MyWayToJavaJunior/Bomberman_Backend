@@ -170,7 +170,7 @@ public class Room {
         broadcast(MessageCreator.createBotsEnableMessage(shouldHaveBots.get()));
         startGameIfEveryoneIsReady();
     }
-    
+
     public void broadcast(String message) {
         for (Map.Entry<UserProfile, MessageSendable> entry: websocketMap.entrySet())
             entry.getValue().sendMessage(message);
@@ -392,7 +392,7 @@ public class Room {
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
     private final AtomicBoolean isFinished = new AtomicBoolean(false);
-    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(true);
+    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(false);
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
     private final Queue<WorldEvent> scheduledActions = new ConcurrentLinkedQueue<>();
