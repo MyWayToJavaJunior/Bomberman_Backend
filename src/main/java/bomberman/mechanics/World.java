@@ -351,7 +351,7 @@ public class World {
         uniqueTiles.stream().filter(uniqueTile -> uniqueTile != null).forEach(uniqueTile -> uniqueTile.applyAction(actor));
     }
 
-    private void tryPlacingBomb(int bombermanID, boolean force) {
+    public void tryPlacingBomb(int bombermanID, boolean force) {
         final Bomberman actor = getBombermanByID(bombermanID);
         if (actor == null)
             return;
