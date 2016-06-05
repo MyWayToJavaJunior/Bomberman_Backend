@@ -153,4 +153,13 @@ public class MessageCreator {
         return messageTemplate.toString();
     }
 
+    public static String createBotsEnableMessage(boolean areBotsActive) {
+        final JSONObject messageTemplate = new JSONObject();
+
+        messageTemplate.put("type", "enable_bots");
+        messageTemplate.put("value", areBotsActive);
+
+        return messageTemplate.toString();
+    }
+
 }

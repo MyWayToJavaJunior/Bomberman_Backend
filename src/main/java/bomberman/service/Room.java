@@ -165,6 +165,12 @@ public class Room {
         }
     }
 
+    public void activateBots(boolean flag) {
+        shouldHaveBots.compareAndSet(!flag, flag);
+        broadcast(MessageCreator.createBotsEnableMessage(shouldHaveBots.get()));
+        startGameIfEveryoneIsReady();
+    }
+    
     public void broadcast(String message) {
         for (Map.Entry<UserProfile, MessageSendable> entry: websocketMap.entrySet())
             entry.getValue().sendMessage(message);

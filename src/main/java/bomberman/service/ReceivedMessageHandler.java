@@ -43,6 +43,14 @@ public class ReceivedMessageHandler /*implements Runnable*/ {
 
             return true;
         }
+        if (messageType.equals("enable_bots")) {
+            if (WebErrorManager.showFieldsNotPresent(message, "value") != null)
+                return false;
+
+            room.activateBots(message.getBoolean("value"));
+
+            return true;
+        }
         //noinspection RedundantIfStatement
         if (messageType.equals("ping")) {
             return true;
