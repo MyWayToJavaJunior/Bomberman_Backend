@@ -71,6 +71,6 @@ public class RoomManagerImplTest {
 
     private static final ArrayList<Pair<UserProfile, MessageSendable>> MOCK_USERS = new ArrayList<>();
     private static final Logger LOGGER = LogManager.getLogger(RoomManagerImplTest.class);
-    private static final int NUMBER_OF_USERS = 20;
     private static final int ROOM_CAPACTITY = 4;
+    private static final int NUMBER_OF_USERS = 25 * ROOM_CAPACTITY;
 }
