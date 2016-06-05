@@ -15,6 +15,17 @@ public class WorldEvent {
         timestamp = 0;
     }
 
+    @Deprecated
+    public WorldEvent(EventType eventType, EntityType entityType, int entityID, float x, float y) {
+        this.eventType = eventType;
+        this.entityType = entityType;
+        this.entityID = entityID;
+        this.x = x;
+        this.y = y;
+        this.initiator = null;
+        timestamp = 0;
+    }
+
     public WorldEvent(EventType eventType, @SuppressWarnings("SameParameterValue") EntityType entityType, int entityID, float x, float y, @Nullable Integer initiator, long timestamp) {
         this.eventType = eventType;
         this.entityType = entityType;

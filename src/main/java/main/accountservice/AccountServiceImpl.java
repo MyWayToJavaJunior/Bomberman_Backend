@@ -49,6 +49,12 @@ public class AccountServiceImpl implements AccountService {
         return registeredUsers.addUser(login, password, isGuest);
     }
 
+    @Nullable
+    @Override
+    public UserProfile createNewUser(@NotNull String login, @NotNull String password) {
+        return createNewUser(login, password, false);
+    }
+
     @Override
     @Nullable
     public Collection<UserProfile> getAllUsers() {

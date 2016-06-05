@@ -27,6 +27,12 @@ public class DataBaseServiceHashMapImpl implements DataBaseService {
         return newUser;
     }
 
+    @Nullable
+    @Override
+    public UserProfile addUser(String login, String password) {
+        return addUser(login, password, false);
+    }
+
     @Override
     @Nullable
     public UserProfile getById(long id) {

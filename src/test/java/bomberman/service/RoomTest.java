@@ -20,6 +20,7 @@ public class RoomTest {
         MOCK_USERS.add(new Pair<>(Constants.customMockUserProfile("u2", "p2", "sid2", 2), mock(MessageSendable.class)));
         MOCK_USERS.add(new Pair<>(Constants.customMockUserProfile("u3", "p3", "sid3", 3), mock(MessageSendable.class)));
         MOCK_USERS.add(new Pair<>(Constants.customMockUserProfile("u4", "p4", "sid4", 4), mock(MessageSendable.class)));
+        MOCK_USERS.add(new Pair<>(Constants.customMockUserProfile("u5", "p5", "sid5", 5), mock(MessageSendable.class)));
     }
 
     @Test
@@ -43,6 +44,7 @@ public class RoomTest {
         room.insertPlayer(MOCK_USERS.get(2).getValue0(), MOCK_USERS.get(2).getValue1());
         room.insertPlayer(MOCK_USERS.get(3).getValue0(), MOCK_USERS.get(3).getValue1());
         assertEquals(true, room.isFilled());
+        assertEquals(false, room.insertPlayer(MOCK_USERS.get(4).getValue0(), MOCK_USERS.get(4).getValue1()));
     }
 
     @Test

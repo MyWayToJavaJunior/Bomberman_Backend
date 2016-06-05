@@ -15,6 +15,13 @@ public class UserProfileData implements Serializable {
         this.isGuest = isGuest ? 1 : 0;
     }
 
+    @Deprecated
+    public UserProfileData(@NotNull String newLogin, @NotNull String newPasssword) {
+        login = newLogin;
+        password = newPasssword;
+        this.isGuest = 0;
+    }
+
     public UserProfileData() {}
 
     @NotNull

@@ -19,6 +19,10 @@ public interface AccountService {
     @Nullable
     UserProfile createNewUser(@NotNull String login, @NotNull String password, boolean isGuest);
 
+    @Deprecated
+    @Nullable
+    UserProfile createNewUser(@NotNull String login, @NotNull String password);
+
     @Nullable
     Collection<UserProfile> getAllUsers();
 

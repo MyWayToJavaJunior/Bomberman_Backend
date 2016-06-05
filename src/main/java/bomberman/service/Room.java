@@ -9,6 +9,7 @@ import main.websockets.MessageSendable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javatuples.Pair;
+import org.jetbrains.annotations.Nullable;
 import rest.UserProfile;
 
 import java.util.*;
@@ -24,12 +25,12 @@ public class Room {
         id = ID_COUNTER.getAndIncrement();
     }
 
-    public Room(AccountService as){
+    public Room(@Nullable AccountService as){
         accountService = as;
         id = ID_COUNTER.getAndIncrement();
     }
 
-    public Room(AccountService as, int overrideCapacity) {
+    public Room(@Nullable AccountService as, int overrideCapacity) {
         accountService = as;
         capacity = overrideCapacity;
         id = ID_COUNTER.getAndIncrement();
@@ -58,6 +59,11 @@ public class Room {
     public int getCurrentCapacity() {
         return websocketMap.size();
     }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
 
     public boolean isFilled()
     {
@@ -94,7 +100,9 @@ public class Room {
 
     public synchronized void removePlayer(UserProfile user) {
         if (websocketMap.containsKey(user)) {
-            accountService.updateUser(user);
+            if (accountService != null)
+                accountService.updateUser(user);
+
             broadcast(MessageCreator.createUserLeftMessage(user));
 
             websocketMap.remove(user);
@@ -212,7 +220,8 @@ public class Room {
 
     private void broadcastFreshEvents() {
         for (WorldEvent event : world.getFreshEvents()) {
-            rewardPlayers(event);
+            if (accountService != null)
+                rewardPlayers(event);
             
             switch (event.getEventType()) {
                 case ENTITY_UPDATED:
@@ -268,7 +277,8 @@ public class Room {
 
         playerMap.remove(bombermanID);
         reversePlayerMap.remove(user);
-        accountService.updateUser(user);
+        if (accountService != null)
+            accountService.updateUser(user);
     }
 
     private void stopIfGameIsOver() {
@@ -350,6 +360,7 @@ public class Room {
         return id;
     }
 
+    @Nullable
     private AccountService accountService = null;
 
     private final int id;
@@ -367,7 +378,7 @@ public class Room {
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicBoolean hasCountDownBegan = new AtomicBoolean(false);
     private final AtomicBoolean isFinished = new AtomicBoolean(false);
-    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(true);
+    private final AtomicBoolean shouldHaveBots = new AtomicBoolean(false);
     public static final int MINIMAL_TIME_STEP = 25; //ms
 
     private final Queue<WorldEvent> scheduledActions = new ConcurrentLinkedQueue<>();

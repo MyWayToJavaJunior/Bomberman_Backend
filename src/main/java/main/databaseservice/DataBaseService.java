@@ -23,6 +23,10 @@ public interface DataBaseService {
     @Nullable
     UserProfile addUser(String login, String password, boolean isGuest);
 
+    @Deprecated
+    @Nullable
+    UserProfile addUser(String login, String password);
+
     boolean containsID(Long id);
 
     boolean containsLogin(String name);

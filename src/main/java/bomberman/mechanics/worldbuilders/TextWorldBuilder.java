@@ -68,7 +68,7 @@ public class TextWorldBuilder implements IWorldBuilder {
     }
 
     @Override
-    public WorldData getWorldData(World newSupplicant) {
+    public synchronized WorldData getWorldData(World newSupplicant) {
         supplicant = newSupplicant;
         generateWorldFromText();
         return new WorldData(tileArray, getBombermenSpawns(), name);
@@ -127,7 +127,8 @@ public class TextWorldBuilder implements IWorldBuilder {
             case 'I':
                 return TileFactory.getInstance().getNewTile(EntityType.BONUS_INVUL, supplicant, supplicant.getNextID());
             case 'S':
-                spawnList.add(new float[]{x + 0.5f, y + 0.5f});
+                if (spawnList.size() < 4)
+                    spawnList.add(new float[]{x + 0.5f, y + 0.5f});
                 return null;
             default:
                 LOGGER.warn("Found undocumented symbol '" + c + "'. Treating him like an empty place.");
