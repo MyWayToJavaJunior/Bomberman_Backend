@@ -3,6 +3,7 @@ package main;
 import bomberman.service.RoomManager;
 import main.config.Context;
 import main.config.ServerInitializer;
+import main.websockets.ExternalControllerWebSocketConnectionServlet;
 import main.websockets.WebSocketConnectionServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -50,8 +51,11 @@ public class Main {
 
         final ServletHolder websocketServletHolder = new ServletHolder(new WebSocketConnectionServlet(context, Integer.parseInt(properties.get("ws_timeout"))));
 
+        final ServletHolder externalControlWebsocketServletHolder = new ServletHolder(new ExternalControllerWebSocketConnectionServlet(context, Integer.parseInt(properties.get("ws_timeout"))));
+
         final ServletContextHandler contextHandler = new ServletContextHandler(server, "/*");
         contextHandler.addServlet(websocketServletHolder, "/game");
+        contextHandler.addServlet(externalControlWebsocketServletHolder, "/game_external_controller");
         contextHandler.addServlet(restServletHolder, "/api/*");
 
         server.setHandler(contextHandler);

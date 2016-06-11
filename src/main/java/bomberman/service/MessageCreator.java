@@ -162,4 +162,13 @@ public class MessageCreator {
         return messageTemplate.toString();
     }
 
+    public static String createControllerGetName(String controllerName) {
+        final JSONObject messageTemplate = new JSONObject();
+
+        messageTemplate.put("type", "get_controller_name");
+        messageTemplate.put("name", controllerName);
+
+        return messageTemplate.toString();
+    }
+
 }
