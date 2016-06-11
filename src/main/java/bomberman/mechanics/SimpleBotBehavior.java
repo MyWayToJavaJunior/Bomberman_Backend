@@ -1,13 +1,15 @@
 package bomberman.mechanics;
 
+import bomberman.mechanics.interfaces.EntityType;
+import bomberman.mechanics.interfaces.ITile;
 import bomberman.mechanics.interfaces.Updateable;
 import bomberman.service.TimeHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Pair;
 import org.javatuples.Triplet;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class SimpleBotBehavior implements Updateable {
     SimpleBotBehavior(Bomberman owner, World world) {
@@ -17,6 +19,7 @@ public class SimpleBotBehavior implements Updateable {
 
     @Override
     public void update(long deltaT) {
+        //noinspection OverlyBroadCatchBlock
         try {
             if (selectNextTargetIfNeeded())
                 pathFinder.calculatePathToTarget();
@@ -27,16 +30,16 @@ public class SimpleBotBehavior implements Updateable {
     }
 
     private boolean selectNextTargetIfNeeded() {
-        if (target.wasReached() && target.shouldLayBomb() && owner.canSpawnBomb()) {
+        if (target.wasReached() || target.canLayBomb()) {
             world.tryPlacingBomb(owner.getID(), false);
             movementsToTarget.clear();
-            targetSelector.selectEvasionTarget();
+            pathFinder.makeEvasionFromBomb();
             return false;
         }
 
         if (target.isInvalid() || target.wasReached()) {
             movementsToTarget.clear();
-            targetSelector.selectNewTarget();
+            pathFinder.selectNewTarget();
             return true;
         }
 
@@ -64,6 +67,11 @@ public class SimpleBotBehavior implements Updateable {
             return this;
         }
 
+        public void invalidateTarget() {
+            x = -1;
+            y = -1;
+        }
+
         public int getY() {
             return y;
         }
@@ -76,9 +84,17 @@ public class SimpleBotBehavior implements Updateable {
             return shouldLayBomb;
         }
 
-        public Target makeLayBomb(boolean shouldLayBomb) {
+        public Target makeLayBomb(@SuppressWarnings("ParameterHidesMemberVariable") boolean shouldLayBomb) {
             this.shouldLayBomb = shouldLayBomb;
             return this;
+        }
+
+        public boolean canLayBomb() {
+            if (shouldLayBomb && owner.canSpawnBomb())
+                if (owner.getCoordinates()[0] == x && owner.getCoordinates()[1] == y)
+                    if (distanceTo(x, y) < owner.getBombExplosionRange())
+                        return true;
+            return false;
         }
 
         public boolean isEvasionTarget() {
@@ -129,12 +145,45 @@ public class SimpleBotBehavior implements Updateable {
         }
 
         public double distanceTo(double anotherX, double anotherY) {
+            /*
             final double distanceX = Math.abs(owner.getCoordinates()[0] - anotherX);
             final double distanceY = Math.abs(owner.getCoordinates()[1] - anotherY);
             return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+            */
+            return pathFinder.distanceBetween(owner.getCoordinates()[0], owner.getCoordinates()[1], anotherX, anotherY);
         }
 
+        public boolean isBonus(ITile tile) {
+            boolean result = false;
+
+            if (tile != null)
+                if (tile.getType() == EntityType.BONUS_DECBOMBSPAWN ||
+                        tile.getType() == EntityType.BONUS_DROPBOMBONDEATH ||
+                        tile.getType() == EntityType.BONUS_INCMAXHP ||
+                        tile.getType() == EntityType.BONUS_INCMAXRANGE ||
+                        tile.getType() == EntityType.BONUS_INCSPEED ||
+                        tile.getType() == EntityType.BONUS_INVUL ||
+                        tile.getType() == EntityType.BONUS_MOREBOMBS)
+                    result = true;
+
+            return result;
+        }
+
+        public boolean isDestructibleWall(ITile tile) {
+            boolean result = false;
+
+            if (tile != null)
+                if (tile.getType() == EntityType.DESTRUCTIBLE_WALL)
+                    result = true;
+
+            return result;
+        }
+
+
+
+        @SuppressWarnings("InstanceVariableNamingConvention")
         private int x = -1;
+        @SuppressWarnings("InstanceVariableNamingConvention")
         private int y = -1;
         private boolean shouldLayBomb = false;
         private boolean isEvasionTarget = false;
@@ -145,7 +194,145 @@ public class SimpleBotBehavior implements Updateable {
         public void calculatePathToTarget() {
             calculatePathTo(target.getX(), target.getY());
         }
-        
+
+        public void makeEvasionFromBomb() {
+            final int bombX = (int) owner.getCoordinates()[0];
+            final int bombY = (int) owner.getCoordinates()[1];
+            final int bombRadius = owner.getBombExplosionRange();
+            final List<Pair<Integer, Integer>> movementsList = calculateEvasionPath(bombX, bombY, 0, bombX, bombY, bombRadius);
+
+            target.makeEvasionTarget(true);
+
+            storeMovements(movementsList);
+        }
+
+        private void storeMovements(List<Pair<Integer, Integer>> movementsList) {
+            long movementStartTime = TimeHelper.now();
+            int prevTileX = (int) owner.getCoordinates()[0];
+            int prevTileY = (int) owner.getCoordinates()[1];
+            for (Pair<Integer, Integer> movement : movementsList) {
+                movementsToTarget.add(new Triplet<>((float) prevTileX - movement.getValue0(), (float) prevTileY - movement.getValue1(), movementStartTime));
+                movementStartTime += getMovementCompletitonTime(distanceBetween(prevTileX, prevTileY, movement.getValue0(), movement.getValue1()));
+                prevTileX = movement.getValue0();
+                prevTileY = movement.getValue1();
+            }
+        }
+
+        public double distanceBetween(double otherX, double otherY, double anotherX, double anotherY) {
+            final double distanceX = Math.abs(otherX - anotherX);
+            final double distanceY = Math.abs(otherY - anotherY);
+            return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        }
+
+        public void selectNewTarget() {
+            if (markBombermanAsATarget(KILL_ENEMY_NOW_RADIUS))
+                return;
+            else if (seekForASpecificTile(GATHER_BONUS_RADIUS, target::isBonus))
+                return;
+            else if (seekForASpecificTile(BREAK_WALL_RADIUS, target::isDestructibleWall))
+                return;
+            else markBombermanAsATarget(KILL_ENEMY_ANYWAY);
+        }
+
+        private boolean markBombermanAsATarget(int notFartherThan) {
+            Bomberman enemy = null;
+
+            for (Bomberman bomberman : world.getBombermen())
+                if (bomberman.getID() != owner.getID())
+                    if (target.distanceTo(bomberman.getCoordinates()[0], bomberman.getCoordinates()[1]) < notFartherThan) {
+                        enemy = bomberman;
+                        break;
+                    }
+
+            if (enemy != null) {
+                target.setX((int) enemy.getCoordinates()[0]);
+                target.setY((int) enemy.getCoordinates()[1]);
+                return true;
+            }
+
+            return false;
+        }
+
+        private boolean seekForASpecificTile(int notFartherThan, SpecificTileCondition cond) {
+            final List<Pair<Integer, Integer>> movementsToASpecificTile = movementsToASpecificTile((int) owner.getCoordinates()[0], (int) owner.getCoordinates()[1], 0, notFartherThan, cond);
+
+            if (!movementsToASpecificTile.isEmpty()) {
+                storeMovements(movementsToASpecificTile);
+                return true;
+            } else
+                return false;
+        }
+
+        private List<Pair<Integer, Integer>> movementsToASpecificTile(int x, int y, int iterationDepth, int notFartherThan, SpecificTileCondition cond) {
+            List<Pair<Integer, Integer>> movementsToReachSafeTile = new LinkedList<>();
+            final ArrayList<List<Pair<Integer, Integer>>> sortArray = new ArrayList<>(4);
+
+            for (int dx = -1; dx < 2; dx += 2)
+                for (int dy = -1; dy < 2; dy += 2) {
+                    final ITile tile = world.getTiles()[y + dy][x + dx];
+                    if (cond.isThisKindOfITile(tile)) {
+                        final LinkedList<Pair<Integer, Integer>> safeMovement = new LinkedList<>();
+
+                        safeMovement.add(new Pair<>(x + dx, y + dy));
+
+                        return safeMovement;
+                    } else if (iterationDepth <= notFartherThan && isTileSafe(x + dx, y + dy)) {
+                        final List<Pair<Integer, Integer>> nextMovements = movementsToASpecificTile(x + dx, y + dy, iterationDepth + 1, notFartherThan, cond);
+
+                        if (!nextMovements.isEmpty()) {
+                            nextMovements.add(0, new Pair<>(x + dx, y + dy));
+                            sortArray.add(nextMovements);
+                        }
+                    }
+                }
+
+            boolean movementsToTargetNotTouched = true;
+
+            if (!sortArray.isEmpty())
+                for (List<Pair<Integer, Integer>> movementList : sortArray)
+                    if (movementsToTargetNotTouched || movementList.size() < movementsToReachSafeTile.size()) {
+                        movementsToTargetNotTouched = false;
+                        movementsToReachSafeTile = movementList;
+                    }
+
+            return movementsToReachSafeTile;
+        }
+
+        // TODO: Move bombY, bombX, bombRadius into a separate lambda and unite this method with previous one.
+        private List<Pair<Integer, Integer>> calculateEvasionPath(int x, int y, int iterationDepth, int bombX, int bombY, int bombRadius) {
+            List<Pair<Integer, Integer>> movementsToReachSafeTile = new LinkedList<>();
+            final ArrayList<List<Pair<Integer, Integer>>> sortArray = new ArrayList<>(4);
+
+            for (int dx = -1; dx < 2; dx += 2)
+                for (int dy = -1; dy < 2; dy += 2)
+                    if (isTileSafeFromExplosion(x + dx, y + dy, bombX, bombY, bombRadius)) {
+                        final LinkedList<Pair<Integer, Integer>> safeMovement = new LinkedList<>();
+
+                        safeMovement.add(new Pair<>(x + dx, y + dy));
+
+                        return safeMovement;
+                    } else
+                        if (iterationDepth <= getMaximalRecursionDepth()) {
+                            final List<Pair<Integer, Integer>> nextMovements = calculateEvasionPath(x + dx, y + dy, iterationDepth + 1, bombX, bombY, bombRadius);
+
+                            if (!nextMovements.isEmpty()) {
+                                nextMovements.add(0, new Pair<>(x + dx, y + dy));
+                                sortArray.add(nextMovements);
+                            }
+                        }
+
+            boolean movementsToTargetNotTouched = true;
+
+            if (!sortArray.isEmpty())
+                for (List<Pair<Integer, Integer>> movementList : sortArray)
+                    if (movementsToTargetNotTouched || movementList.size() < movementsToReachSafeTile.size()) {
+                        movementsToTargetNotTouched = false;
+                        movementsToReachSafeTile = movementList;
+                    }
+
+            return movementsToReachSafeTile;
+        }
+
         private void calculatePathTo(double x, double y) {
 
         }
@@ -155,22 +342,45 @@ public class SimpleBotBehavior implements Updateable {
         }
 
         private long getMovementCompletitonTime(double distance) {
-            return (long) Math.floor(1000.0 * distance / owner.getMaximalSpeed());
+            return (long) Math.floor(distance / owner.getMaximalSpeed());
         }
 
+        private boolean isTileSafeFromExplosion(int tileX, int tileY, int bombX, int bombY, int bombRadius) {
+            if (isTileSafe(tileX, tileY)) {
+                if (tileX != bombX || tileY != bombY)
+                    return true;
+                if (distanceBetween(tileX, tileY, bombX, bombY) > bombRadius)
+                    return true;
+            }
+            //Lazy to check any obstacles
+            return false;
+        }
+
+        private boolean isTileSafe(int tileX, int tileY) {
+            if (tileX < 0 || tileX > world.getWidth())
+                return false;
+            if (tileY < 0 || tileY > world.getHeight())
+                return false;
+
+            final ITile tile = world.getTiles()[tileY][tileX];
+
+            return tile == null || tile.isPassable() && tile.getType() != EntityType.BOMB_RAY;
+        }
+
+        private int getMaximalRecursionDepth() {
+            return owner.getBombExplosionRange();
+        }
+
+        public static final int KILL_ENEMY_NOW_RADIUS = 4; // any enemy bomberman within 5 tile radius will be a target.
+        public static final int GATHER_BONUS_RADIUS = 8; // any bonus within 8 tile radius will be a target.
+        public static final int BREAK_WALL_RADIUS = 12; // covers ~2/3 of the map. Any breakable wall will be attemted to be removed
+        public static final int KILL_ENEMY_ANYWAY = 256; // if the map is scorched and nothing else can be broken, scout and destroy enemies!
     }
     private final PathFinder pathFinder = new PathFinder();
 
-    private class TargetSelector {
-        public void selectEvasionTarget() {
-
-        }
-
-        public void selectNewTarget() {
-
-        }
+    interface SpecificTileCondition {
+        boolean isThisKindOfITile(ITile tile);
     }
-    private final TargetSelector targetSelector = new TargetSelector();
 
     private final Bomberman owner;
     private final World world;

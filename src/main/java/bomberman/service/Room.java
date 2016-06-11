@@ -296,18 +296,20 @@ public class Room {
 
     private void stopIfGameIsOver() {
         if (world.getBombermanCount() == 1 && !isSinglePlayer) {
+
             TimeHelper.executeAfter(TIME_TO_WAIT_ON_GAME_OVER, () -> {
                 if (!isFinished.get() && world.getBombermanCount() == 1) {
                     isFinished.compareAndSet(false, true);
 
                     if (accountService != null)
                         accountService.updateScore(playerMap.get(world.getBombermenIDs()[0]), SCORE_ON_GAME_WON);
-
+                    LOGGER.info("Winner is " + playerMap.get(world.getBombermenIDs()[0]) + " in room " + this);
                     broadcast(MessageCreator.createGameOverMessage(playerMap.get(world.getBombermenIDs()[0])));
                 }
             });
+
         }
-        if (world.getBombermanCount() == 0) {
+        if (playerMap.isEmpty()) {
             isFinished.compareAndSet(false, true);
             broadcast(MessageCreator.createGameOverMessage(null));
         }
