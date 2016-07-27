@@ -377,6 +377,7 @@ public class Room {
         if (controllerWebsocket != null && websocketMap.containsKey(user)) {
             controllerWebsocket.setRoom(this);
             controllerWebsocket.setUser(user);
+            websocketMap.get(user).sendMessage("Ok!");
         } else
             websocketMap.get(user).sendMessage("No such controller!");
     }

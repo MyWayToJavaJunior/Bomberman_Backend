@@ -49,7 +49,6 @@ public class ExternalControllerWebSocketConnection implements MessageSendable{
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
-        roomManager.removeUserFromRoom(user);
         LOGGER.error("Closed socket with session \"" + session + "\" for controller #" + name + '!');
     }
 
