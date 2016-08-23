@@ -51,14 +51,6 @@ public class ReceivedMessageHandler /*implements Runnable*/ {
 
             return true;
         }
-        if (messageType.equals("set_controller_name")) {
-            if (WebErrorManager.showFieldsNotPresent(message, "name") != null)
-                return false;
-
-            room.assignControllerToUser(message.getString("name"), user);
-
-            return true;
-        }
         //noinspection RedundantIfStatement
         if (messageType.equals("ping")) {
             return true;

@@ -4,9 +4,7 @@ import bomberman.mechanics.World;
 import bomberman.mechanics.WorldEvent;
 import bomberman.mechanics.interfaces.EntityType;
 import bomberman.mechanics.interfaces.EventType;
-import main.ExternalControllerLocator;
 import main.accountservice.AccountService;
-import main.websockets.ExternalControllerWebSocketConnection;
 import main.websockets.MessageSendable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -372,15 +370,6 @@ public class Room {
         }
     }
 
-    public void assignControllerToUser(String name, UserProfile user) {
-        final ExternalControllerWebSocketConnection controllerWebsocket = ExternalControllerLocator.getByName(name);
-        if (controllerWebsocket != null && websocketMap.containsKey(user)) {
-            controllerWebsocket.setRoom(this);
-            controllerWebsocket.setUser(user);
-        } else
-            websocketMap.get(user).sendMessage("No such controller!");
-    }
-
     @Override
     public int hashCode() {
         return id;
@@ -400,7 +389,6 @@ public class Room {
     private final Map<UserProfile, MessageSendable> websocketMap = new ConcurrentHashMap<>(4);
     private final Map<UserProfile, Pair<Boolean, Boolean>> readinessMap = new ConcurrentHashMap<>(4);
     private final Map<UserProfile, Long> timeToKickMap = new ConcurrentHashMap<>(4);
-    private final Map<ExternalControllerWebSocketConnection, UserProfile> controllerMap = new ConcurrentHashMap<>(4);
 
     private World world;
     private final AtomicBoolean isActive = new AtomicBoolean(false);

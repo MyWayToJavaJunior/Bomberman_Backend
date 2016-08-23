@@ -21,7 +21,8 @@ public class SimpleBotBehavior implements Updateable {
     public void update(long deltaT) {
         //noinspection OverlyBroadCatchBlock
         try {
-            selectNextTargetIfNeeded();
+            if (selectNextTargetIfNeeded())
+                pathFinder.calculatePathToTarget();
             passMovementsToTarget();
         } catch (Exception ex) {
             LOGGER.error("Something happened in bot's " + owner + " behavior " + this, ex);
@@ -29,7 +30,7 @@ public class SimpleBotBehavior implements Updateable {
     }
 
     private boolean selectNextTargetIfNeeded() {
-        if (target.wasReached() && target.canLayBomb()) {
+        if (target.wasReached() || target.canLayBomb()) {
             world.tryPlacingBomb(owner.getID(), false);
             movementsToTarget.clear();
             pathFinder.makeEvasionFromBomb();
@@ -201,7 +202,6 @@ public class SimpleBotBehavior implements Updateable {
             final List<Pair<Integer, Integer>> movementsList = calculateEvasionPath(bombX, bombY, 0, bombX, bombY, bombRadius);
 
             target.makeEvasionTarget(true);
-            target.makeLayBomb(false);
 
             storeMovements(movementsList);
         }
@@ -225,16 +225,13 @@ public class SimpleBotBehavior implements Updateable {
         }
 
         public void selectNewTarget() {
-            target.makeEvasionTarget(false);
-
             if (markBombermanAsATarget(KILL_ENEMY_NOW_RADIUS))
-                target.makeLayBomb(true);
+                return;
             else if (seekForASpecificTile(GATHER_BONUS_RADIUS, target::isBonus))
-                target.makeLayBomb(false);
+                return;
             else if (seekForASpecificTile(BREAK_WALL_RADIUS, target::isDestructibleWall))
-                target.makeLayBomb(true);
-            else if (markBombermanAsATarget(KILL_ENEMY_ANYWAY))
-                target.makeLayBomb(true);
+                return;
+            else markBombermanAsATarget(KILL_ENEMY_ANYWAY);
         }
 
         private boolean markBombermanAsATarget(int notFartherThan) {
